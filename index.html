@@ -554,34 +554,14 @@ async function confirmReset() {
   }
 }
 // ─── EVENT LISTENERS ─────────────────────────────────────────────────────────
-document.addEventListener('DOMContentLoaded', () => {
-  // Intro
-  document.getElementById('btnStart')
-    .addEventListener('click', startQuiz);
-  document.getElementById('playerName')
-    .addEventListener('keydown', e => { if (e.key === 'Enter') startQuiz(); });
-  document.getElementById('dashLink')
-    .addEventListener('click', e => { e.preventDefault(); showDashboard(); });
-
-  // Quiz
-  document.getElementById('btnNext')
-    .addEventListener('click', () => nextQuestion());
-
-  // Results
-  document.getElementById('btnRestart')
-    .addEventListener('click', restartQuiz);
-
-  // Dashboard
-  document.getElementById('btnDashBack')
-    .addEventListener('click', () => showSection('intro'));
-  document.getElementById('btnRefresh')
-    .addEventListener('click', loadDashboard);
-  document.getElementById('btnExport')
-    .addEventListener('click', exportCSV);
-  document.getElementById('btnReset')
-    .addEventListener('click', confirmReset);
-});
-
+// type="module" est defer par défaut : le DOM est garanti prêt à ce stade.
+document.getElementById('btnStart').addEventListener('click', startQuiz);
+document.getElementById('playerName').addEventListener('keydown', e => { if (e.key === 'Enter') startQuiz(); });
+document.getElementById('dashLink').addEventListener('click', e => { e.preventDefault(); showDashboard(); });
+document.getElementById('btnNext').addEventListener('click', () => nextQuestion());
+document.getElementById('btnRestart').addEventListener('click', restartQuiz);
+document.getElementById('btnDashBack').addEventListener('click', () => showSection('intro'));
+document.getElementById('btnRefresh').addEventListener('click', loadDashboard);
+document.getElementById('btnExport').addEventListener('click', exportCSV);
+document.getElementById('btnReset').addEventListener('click', confirmReset);
 </script>
-</body>
-</html>
