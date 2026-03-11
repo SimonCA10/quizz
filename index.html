@@ -148,9 +148,32 @@
     h1 { font-size: 2rem; }
   }
 </style>
-  <!-- Firebase SDK -->
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+  <!-- Firebase SDK (module CDN v12) -->
+  <script type="module" id="firebase-init">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-app.js";
+    import { getDatabase, ref, push, onValue, remove } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-database.js";
+
+    const firebaseConfig = {
+      apiKey:            "AIzaSyCAHB3CxRQ1QylFE0xtAE40ZtZHeJoxO8s",
+      authDomain:        "quizztoa.firebaseapp.com",
+      databaseURL:       "https://quizztoa-default-rtdb.europe-west1.firebasedatabase.app",
+      projectId:         "quizztoa",
+      storageBucket:     "quizztoa.firebasestorage.app",
+      messagingSenderId: "18804426173",
+      appId:             "1:18804426173:web:3959cbe2594fe2937e7ed4"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db  = getDatabase(app);
+    window._fbDb    = db;
+    window._fbRef   = ref;
+    window._fbPush  = push;
+    window._fbOn    = onValue;
+    window._fbRemove = remove;
+
+    // Signaler que Firebase est prêt
+    window.dispatchEvent(new Event('firebase-ready'));
+  </script>
 </head>
 <body>
 <div class="container">
@@ -311,23 +334,23 @@ const questions = [
 
 
 // ============================================================
-// FIREBASE CONFIG — remplace ces valeurs par les tiennes
-// (Console Firebase > Paramètres projet > Vos applications)
+// FIREBASE — accès via les helpers exposés par le module init
+// (la config est dans le bloc <script type="module"> ci-dessus)
 // ============================================================
-const FIREBASE_CONFIG = {
-  apiKey:            "VOTRE_API_KEY",
-  authDomain:        "VOTRE_PROJECT.firebaseapp.com",
-  databaseURL:       "https://VOTRE_PROJECT-default-rtdb.europe-west1.firebasedatabase.app",
-  projectId:         "VOTRE_PROJECT",
-  storageBucket:     "VOTRE_PROJECT.appspot.com",
-  messagingSenderId: "VOTRE_SENDER_ID",
-  appId:             "VOTRE_APP_ID"
-};
+let participantsRef = null;
 
-// Init Firebase
-firebase.initializeApp(FIREBASE_CONFIG);
-const db = firebase.database();
-const participantsRef = db.ref('participants');
+// Attendre que Firebase soit prêt avant toute interaction
+function getParticipantsRef() {
+  if (!participantsRef && window._fbDb) {
+    participantsRef = window._fbRef(window._fbDb, 'participants');
+  }
+  return participantsRef;
+}
+
+function waitForFirebase(cb) {
+  if (window._fbDb) { cb(); return; }
+  window.addEventListener('firebase-ready', cb, { once: true });
+}
 
 // ============================================================
 // STATE
@@ -449,11 +472,14 @@ async function showResults() {
   const note = document.getElementById('savingNote');
   note.textContent = 'Enregistrement du score en cours…';
   try {
-    const key = `${Date.now()}-${Math.random().toString(36).slice(2,7)}`;
-    await participantsRef.child(key).set({
-      name: playerName,
-      score: score,
-      ts: Date.now()
+    await new Promise((resolve, reject) => {
+      waitForFirebase(() => {
+        window._fbPush(getParticipantsRef(), {
+          name: playerName,
+          score: score,
+          ts: Date.now()
+        }).then(resolve).catch(reject);
+      });
     });
     note.textContent = `✓ Score enregistré — ${playerName} : ${score}/15`;
   } catch(e) {
@@ -477,10 +503,10 @@ function loadDashboard() {
   document.getElementById('participantsBody').innerHTML =
     '<tr><td colspan="4" style="color:rgba(245,240,232,0.3);font-style:italic;padding:16px 12px;">Chargement…</td></tr>';
 
-  // Détacher l'ancien listener si présent
-  if (dashListener) { participantsRef.off('value', dashListener); }
+  // (les listeners Firebase module se gèrent via unsubscribe — simplifié ici)
 
-  dashListener = participantsRef.on('value', snapshot => {
+  waitForFirebase(() => {
+  dashListener = window._fbOn(getParticipantsRef(), snapshot => {
     const raw = snapshot.val() || {};
     let participants = Object.values(raw);
 
@@ -544,6 +570,7 @@ function loadDashboard() {
     document.getElementById('participantsBody').innerHTML =
       '<tr><td colspan="4" style="color:#E07070;padding:16px 12px;">Erreur de connexion Firebase.</td></tr>';
   });
+  }); // end waitForFirebase
 }
 
 function esc(str) {
@@ -568,7 +595,11 @@ function exportCSV() {
 async function confirmReset() {
   if (!confirm('⚠️ Supprimer TOUS les scores enregistrés ? Action irréversible.')) return;
   try {
-    await participantsRef.remove();
+    await new Promise((resolve, reject) => {
+      waitForFirebase(() => {
+        window._fbRemove(getParticipantsRef()).then(resolve).catch(reject);
+      });
+    });
     alert('Tous les scores ont été supprimés.');
   } catch {
     alert('Erreur lors de la réinitialisation.');
