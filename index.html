@@ -506,7 +506,7 @@ function loadDashboard() {
     const tbody = document.getElementById('participantsBody');
     tbody.innerHTML = '';
     if (sorted.length === 0) {
-      tbody.innerHTML = '<tr><td colspan="4" style="color:rgba(245,240,232,0.3);font-style:italic;padding:16px 12px;">Aucun participant enregistré pour l'instant.</td></tr>';
+      tbody.innerHTML = `<tr><td colspan="4" style="color:rgba(245,240,232,0.3);font-style:italic;padding:16px 12px;">Aucun participant enregistré pour l'instant.</td></tr>`;
       return;
     }
     const teamInfo = { A:['badge-a','🏆 Troyes'], B:['badge-b','🌿 Othe'], C:['badge-c','🍎 Armance'] };
