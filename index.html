@@ -167,13 +167,12 @@
     </div>
     <div class="name-section">
       <label class="name-label" for="playerName">Votre prénom</label>
-      <input class="name-input" id="playerName" type="text" placeholder="Ex : Sophie" maxlength="40" autocomplete="off"
-        onkeydown="if(event.key==='Enter') startQuiz()" />
+      <input class="name-input" id="playerName" type="text" placeholder="Ex : Sophie" maxlength="40" autocomplete="off" />
       <div class="name-error" id="nameError">Merci d'indiquer votre prénom pour commencer.</div>
     </div>
-    <button class="btn-start" onclick="startQuiz()">Commencer le quiz →</button>
+    <button class="btn-start" id="btnStart">Commencer le quiz →</button>
     <p class="intro-note">Chaque bonne réponse rapporte 1 point · La répartition des équipes sera calculée automatiquement</p>
-    <div class="dashboard-link"><a href="#" onclick="showDashboard(); return false;">⚙ Accès animateur</a></div>
+    <div class="dashboard-link"><a href="#" id="dashLink">⚙ Accès animateur</a></div>
   </div>
 
   <!-- QUIZ -->
@@ -199,7 +198,7 @@
       </div>
     </div>
     <div class="nav">
-      <button class="btn-next" id="btnNext" onclick="nextQuestion()">Question suivante →</button>
+      <button class="btn-next" id="btnNext">Question suivante →</button>
     </div>
   </div>
 
@@ -219,7 +218,7 @@
       <div id="breakdownList"></div>
     </div>
     <div class="saving-note" id="savingNote">Enregistrement en cours…</div>
-    <button class="btn-restart" onclick="restartQuiz()">↺ Passer à un autre participant</button>
+    <button class="btn-restart" id="btnRestart">↺ Passer à un autre participant</button>
   </div>
 
   <!-- DASHBOARD -->
@@ -229,7 +228,7 @@
         <div class="tag" style="margin-bottom:12px;">Animateur</div>
         <h2>Tableau de bord <span>équipes</span></h2>
       </div>
-      <button class="btn-dash-back" onclick="showSection('intro')">← Retour quiz</button>
+      <button class="btn-dash-back" id="btnDashBack">← Retour quiz</button>
     </div>
 
     <div class="dash-stats">
@@ -264,9 +263,9 @@
     </table>
 
     <div class="dash-actions">
-      <button class="btn-action primary" onclick="loadDashboard()">↻ Actualiser</button>
-      <button class="btn-action" onclick="exportCSV()">⬇ Exporter CSV</button>
-      <button class="btn-action danger" onclick="confirmReset()">🗑 Réinitialiser</button>
+      <button class="btn-action primary" id="btnRefresh">↻ Actualiser</button>
+      <button class="btn-action" id="btnExport">⬇ Exporter CSV</button>
+      <button class="btn-action danger" id="btnReset">🗑 Réinitialiser</button>
     </div>
   </div>
 
@@ -343,14 +342,7 @@ function showDashboard() {
   loadDashboard();
 }
 
-// Exposer au HTML inline (onclick="...")
-window.showDashboard  = showDashboard;
-window.startQuiz      = startQuiz;
-window.nextQuestion   = nextQuestion;
-window.restartQuiz    = restartQuiz;
-window.loadDashboard  = loadDashboard;
-window.exportCSV      = exportCSV;
-window.confirmReset   = confirmReset;
+// Exposer au HTML inline ()
 
 // ─── QUIZ ────────────────────────────────────────────────────────────────────
 function startQuiz() {
@@ -561,6 +553,35 @@ async function confirmReset() {
     alert('Erreur lors de la réinitialisation.');
   }
 }
+// ─── EVENT LISTENERS ─────────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', () => {
+  // Intro
+  document.getElementById('btnStart')
+    .addEventListener('click', startQuiz);
+  document.getElementById('playerName')
+    .addEventListener('keydown', e => { if (e.key === 'Enter') startQuiz(); });
+  document.getElementById('dashLink')
+    .addEventListener('click', e => { e.preventDefault(); showDashboard(); });
+
+  // Quiz
+  document.getElementById('btnNext')
+    .addEventListener('click', () => nextQuestion());
+
+  // Results
+  document.getElementById('btnRestart')
+    .addEventListener('click', restartQuiz);
+
+  // Dashboard
+  document.getElementById('btnDashBack')
+    .addEventListener('click', () => showSection('intro'));
+  document.getElementById('btnRefresh')
+    .addEventListener('click', loadDashboard);
+  document.getElementById('btnExport')
+    .addEventListener('click', exportCSV);
+  document.getElementById('btnReset')
+    .addEventListener('click', confirmReset);
+});
+
 </script>
 </body>
 </html>
