@@ -57,7 +57,7 @@
 
   /* INTRO */
   #intro { text-align: center; padding: 48px 0; }
-  .intro-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin: 36px 0; }
+  .intro-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin: 36px auto; max-width: 480px; }
   .intro-card { border: 1px solid rgba(201,168,76,0.2); padding: 20px 14px; font-size: 0.88rem; color: rgba(245,240,232,0.65); }
   .intro-card strong { display: block; font-family: 'Playfair Display', serif; font-size: 1.5rem; color: var(--gold); margin-bottom: 6px; }
   .name-section { margin: 28px 0 8px; }
@@ -153,6 +153,7 @@
 <body>
 <div class="container">
   <header>
+    
     <div class="tag">Quiz territorial</div>
     <h1>Troyes <span>·</span> Othe <span>·</span> Armance</h1>
     <p class="subtitle">Découvrez et célébrez votre territoire</p>
@@ -162,7 +163,6 @@
   <div id="intro">
     <div class="intro-grid">
       <div class="intro-card"><strong>15</strong>Questions variées sur votre territoire</div>
-      <div class="intro-card"><strong>3</strong>Équipes réparties équitablement selon vos scores</div>
       <div class="intro-card"><strong>5</strong>Thématiques — histoire, nature, culture, gastronomie, géographie</div>
     </div>
     <div class="name-section">
@@ -171,7 +171,7 @@
       <div class="name-error" id="nameError">Merci d'indiquer votre prénom pour commencer.</div>
     </div>
     <button class="btn-start" id="btnStart">Commencer le quiz →</button>
-    <p class="intro-note">Chaque bonne réponse rapporte 1 point · La répartition des équipes sera calculée automatiquement</p>
+    <p class="intro-note">Chaque bonne réponse rapporte 1 point</p>
     <div class="dashboard-link"><a href="#" id="dashLink">⚙ Accès animateur</a></div>
   </div>
 
@@ -209,11 +209,7 @@
       <h2>Bravo, c'est terminé !</h2>
       <div class="final-score" id="finalScore">0 <span>/ 15 points</span></div>
     </div>
-    <div class="team-section" id="teamSection">
-      <div class="team-name">⏳ Équipe en attente</div>
-      <div class="team-desc">Votre score a bien été enregistré. L'animateur lancera la répartition des équipes une fois que tous les participants auront terminé le quiz.</div>
-    </div>
-    <div class="breakdown">
+        <div class="breakdown">
       <p class="breakdown-title">Votre détail par catégorie</p>
       <div id="breakdownList"></div>
     </div>
@@ -237,28 +233,11 @@
       <div class="stat-card"><div class="stat-value" id="statBest">—</div><div class="stat-label">Meilleur score</div></div>
     </div>
 
-    <p class="dash-section-title">Répartition en 3 équipes égales</p>
-    <p class="dash-note">Tri par score décroissant → division en tiers : le tiers supérieur forme l'Équipe Troyes, le médian l'Équipe Othe, le tiers inférieur l'Équipe Armance.</p>
-
-    <div class="teams-grid">
-      <div class="team-col col-a">
-        <div class="team-col-header">🏆 Équipe Troyes<span class="team-col-count" id="countA">0 participant(s)</span></div>
-        <ul class="team-members" id="listA"></ul>
-      </div>
-      <div class="team-col col-b">
-        <div class="team-col-header">🌿 Équipe Othe<span class="team-col-count" id="countB">0 participant(s)</span></div>
-        <ul class="team-members" id="listB"></ul>
-      </div>
-      <div class="team-col col-c">
-        <div class="team-col-header">🍎 Équipe Armance<span class="team-col-count" id="countC">0 participant(s)</span></div>
-        <ul class="team-members" id="listC"></ul>
-      </div>
-    </div>
-
+        
     <p class="dash-section-title">Tous les participants</p>
     <p class="dash-refresh" id="lastRefresh"></p>
     <table class="participants-table">
-      <thead><tr><th>#</th><th>Prénom</th><th>Score</th><th>Équipe</th></tr></thead>
+      <thead><tr><th>#</th><th>Prénom</th><th>Score</th></tr></thead>
       <tbody id="participantsBody"></tbody>
     </table>
 
@@ -315,7 +294,7 @@ const questions = [
   { cat:"Histoire & Patrimoine", q:"Quel était le nom gallo-romain antique de Troyes, capitale de la tribu gauloise des Tricasses ?", opts:["Durocortorum","Augustobona","Agedincum","Caesaromagus"], ans:1, revealImg: IMGS.augustobona, info:"Avant de devenir Troyes, la ville s'appelait Augustobona Tricassium. Elle était reliée à la voie d'Agrippa allant de Milan à Boulogne-sur-Mer, ce qui en faisait un carrefour stratégique majeur." },
   { cat:"Géographie", q:"Le centre historique de Troyes, vu du ciel, est célèbre pour sa forme singulière. À quoi la compare-t-on traditionnellement ?", opts:["À un fer à cheval","À un bouchon de champagne","À une feuille de chêne","À un escargot médiéval"], ans:1, revealImg: IMGS.bouchon, info:"Le centre historique de Troyes, de forme ovale irrégulière, est souvent comparé à un bouchon de champagne vu du ciel — une image qui résume l'identité champenoise de la ville." },
   { cat:"Nature & Environnement", q:"Quelle est la nature géologique dominante du sous-sol du Pays d'Othe qui explique ses spécificités hydrologiques ?", opts:["Le granite armoricain","Le calcaire jurassique","La craie sénonienne et turonienne","Le grès vosgien"], ans:2, info:"Le Pays d'Othe repose sur de la craie sénonienne et turonienne très poreuse, à l'origine d'une vaste nappe phréatique alimentant de nombreux cours d'eau, dont l'Armance et la Vanne." },
-  { cat:"Nature & Environnement", q:"Le cidre du Pays d'Othe est :", opts:["Une IGP","Une AOP","Un AOC","Label Rouge"], ans:0, info:"Le cidre du Pays d'Othe bénéficie d'une IGP (Indication Géographique Protégée), signe officiel de qualité qui garantit son origine et ses méthodes de fabrication traditionnelles dans la région." },
+  { cat:"Nature & Environnement", q:"Le cidre du Pays d'Othe est :", opts:["Une IGP","Une AOP","Une AOC","Label Rouge"], ans:0, info:"Le cidre du Pays d'Othe bénéficie d'une IGP (Indication Géographique Protégée), signe officiel de qualité qui garantit son origine et ses méthodes de fabrication traditionnelles dans la région." },
   { cat:"Gastronomie", q:"Quelle brasserie artisanale du Pays d'Othe brasse l'orge produite par un frère sur une exploitation familiale fondée en 1936 ?", opts:["La Brasserie de la Forêt d'Orient","La Brasserie Thibord","La Brasserie de l'Armance","La Brasserie des Tricasses"], ans:1, revealImg: IMGS.thibord, info:"La Brasserie Thibord illustre la valorisation locale : elle brasse l'orge cultivée sur l'exploitation familiale fondée en 1936, ancrant la brasserie dans le tissu agro-alimentaire du territoire." },
   { cat:"Histoire & Patrimoine", q:"Quel monument unique en France se trouve dans la collégiale de Villemaur-sur-Vanne, l'un des six derniers de ce type ?", opts:["Un orgue baroque","Un jubé en bois","Une crypte romane","Un labyrinthe en pierre"], ans:1, revealImg: IMGS.villemaur, info:"Le jubé en bois de la collégiale de l'Assomption-de-la-Vierge de Villemaur-sur-Vanne est l'un des six jubés restants en France — un chef-d'œuvre exceptionnel du patrimoine local." },
   { cat:"Culture & Tourisme", q:"Pour quel type de commerce Troyes est-elle reconnue comme capitale européenne ?", opts:["Les antiquités","Les magasins d'usine et de marques","Le marché de l'artisanat","La gastronomie étoilée"], ans:1, revealImg: IMGS.mcarthur, info:"Troyes est la capitale européenne des magasins d'usine avec près de 280 magasins sur 85 000 m², regroupés dans trois centres : Marques City, Marques Avenue et McArthur Glen." },
@@ -509,11 +488,9 @@ function loadDashboard() {
       tbody.innerHTML = `<tr><td colspan="4" style="color:rgba(245,240,232,0.3);font-style:italic;padding:16px 12px;">Aucun participant enregistré pour l'instant.</td></tr>`;
       return;
     }
-    const teamInfo = { A:['badge-a','🏆 Troyes'], B:['badge-b','🌿 Othe'], C:['badge-c','🍎 Armance'] };
     sorted.forEach((p, i) => {
-      const [cls, label] = teamInfo[p.team];
       const tr = document.createElement('tr');
-      tr.innerHTML = `<td style="color:rgba(245,240,232,0.3)">${i+1}</td><td>${esc(p.name)}</td><td style="font-family:'Playfair Display',serif;color:var(--gold)">${p.score}<span style="color:rgba(245,240,232,0.3);font-size:0.8rem;font-family:'Crimson Pro',serif">/15</span></td><td><span class="badge-team ${cls}">${label}</span></td>`;
+      tr.innerHTML = `<td style="color:rgba(245,240,232,0.3)">${i+1}</td><td>${esc(p.name)}</td><td style="font-family:'Playfair Display',serif;color:var(--gold)">${p.score}<span style="color:rgba(245,240,232,0.3);font-size:0.8rem;font-family:'Crimson Pro',serif">/15</span></td>`;
       tbody.appendChild(tr);
     });
 
