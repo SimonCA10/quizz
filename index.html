@@ -1,0 +1,858 @@
+<!DOCTYPE html>
+<html lang="fr" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex">
+<title>AAC de Bar-sur-Seine · Ateliers</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+[hidden]{display:none!important}
+:root{
+  --bg:#EDF2F0; --card:#FFFFFF; --ink:#0D2E39; --muted:#557079; --line:#CFDBD9;
+  --accent:#0E7C90; --accent-soft:#E2F1F3; --on-accent:#FFFFFF;
+  --c-oui:#2C7A4B; --c-test:#5FAE83; --c-warn:#D89A24; --c-no:#B4583F; --c-neutral:#8AA1A9;
+  --font-h:'Bricolage Grotesque',ui-rounded,system-ui,sans-serif;
+  --font-b:'Public Sans',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+}
+[data-theme=dark]{
+  --bg:#0A2430; --card:#113445; --ink:#EAF5F3; --muted:#8FB0B9; --line:#245363;
+  --accent:#4CC2D8; --accent-soft:#0E3F50; --on-accent:#06222B;
+}
+body{margin:0;background:var(--bg);color:var(--ink);font:400 16px/1.45 var(--font-b);min-height:100vh}
+h1,h2,h3{font-family:var(--font-h);line-height:1.15;margin:0}
+p{margin:0}
+button{font-family:inherit;cursor:pointer;color:inherit}
+button:focus-visible,textarea:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.hint{color:var(--muted);font-size:.9em}
+.demo-flag{background:#F7E3B0;color:#5A4200;font-size:.8rem;padding:6px 12px;text-align:center}
+.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:999px;font-weight:600;font-size:.9rem;z-index:50;max-width:90vw;text-align:center}
+
+/* ---------- participant ---------- */
+.pv{max-width:640px;margin:0 auto;padding:0 16px calc(28px + env(safe-area-inset-bottom))}
+.pv-head{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:calc(14px + env(safe-area-inset-top)) 0 10px}
+.pv-brand{display:flex;align-items:center;gap:8px;font:700 1rem var(--font-h)}
+.pv-brand svg{width:16px;height:22px;fill:var(--accent)}
+.pv-step{font-size:.85rem;color:var(--muted);font-weight:600}
+.pv-tabs{display:flex;gap:6px;margin:0 0 12px;overflow-x:auto;padding-bottom:4px}
+.pv-tabs button{flex:0 0 auto;border:2px solid var(--line);background:var(--card);border-radius:999px;padding:6px 14px;font-weight:600;font-size:.85rem}
+.pv-tabs button.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.pv-title{font-size:1.7rem;font-weight:800;margin:6px 0 8px}
+.pv-lead{color:var(--muted);margin-bottom:16px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px;margin:0 0 12px}
+.card h3{font-size:1.08rem;font-weight:700;margin-bottom:4px}
+.card .hint{margin-bottom:10px}
+.opts{display:grid;gap:8px;margin-top:8px}
+.opts.three{grid-template-columns:repeat(3,1fr)}
+.opts.four{grid-template-columns:repeat(2,1fr)}
+.opt{min-height:50px;border:2px solid var(--line);background:var(--card);border-radius:12px;font-weight:600;font-size:.88rem;line-height:1.2;padding:8px 6px;text-align:center}
+.opt.on{color:#fff;border-color:transparent}
+.opt.on[data-v=oui],.opt.on[data-v=fait]{background:var(--c-oui)}
+.opt.on[data-v=test]{background:var(--c-test);color:#0A2A1A}
+.opt.on[data-v=nuance],.opt.on[data-v=cond]{background:var(--c-warn);color:#2B1D00}
+.opt.on[data-v=non],.opt.on[data-v=pas]{background:var(--c-no)}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{border:2px solid var(--line);background:var(--card);border-radius:999px;padding:10px 14px;font-weight:600;font-size:.92rem;text-align:left}
+.chip.on{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
+.segs{display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap}
+.seg{flex:1 1 140px;border:2px solid var(--line);background:var(--card);border-radius:12px;padding:10px;font-weight:600;font-size:.9rem;display:flex;align-items:center;gap:8px;justify-content:center}
+.seg .dot{width:10px;height:10px;border-radius:50%;background:var(--c-neutral)}
+.seg.g .dot{background:var(--c-oui)} .seg.r .dot{background:var(--c-no)}
+.seg.on{border-color:var(--ink);background:var(--accent-soft)}
+textarea{width:100%;border:2px solid var(--line);border-radius:12px;padding:12px;font:inherit;background:var(--card);color:var(--ink);resize:vertical}
+.btn{min-height:48px;border-radius:12px;border:0;padding:10px 18px;font-weight:700;font-size:1rem}
+.btn.primary{background:var(--accent);color:var(--on-accent);width:100%;margin-top:8px}
+.mine{margin-top:10px;display:grid;gap:6px}
+.mynote{display:flex;justify-content:space-between;gap:10px;align-items:flex-start;background:var(--accent-soft);border-radius:10px;padding:8px 10px;font-size:.9rem;border-left:4px solid var(--c-neutral)}
+.mynote.si{border-left-color:var(--c-oui)} .mynote.rouge{border-left-color:var(--c-no)}
+.x{border:0;background:transparent;font-size:1rem;color:var(--muted);padding:2px 6px;line-height:1}
+.idea{display:flex;gap:12px;align-items:center;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px 12px;margin-bottom:8px}
+.idea p{flex:1}
+.vote{flex:0 0 auto;min-width:64px;min-height:52px;border:2px solid var(--line);background:var(--card);border-radius:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;font-weight:700}
+.vote.on{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
+.drops{display:flex;align-items:center;gap:6px;margin:0 0 14px;position:sticky;top:0;background:var(--bg);padding:8px 0;z-index:5}
+.drop{width:22px;height:30px;opacity:.25}
+.drop svg{width:100%;height:100%;fill:var(--accent)}
+.drop.full{opacity:1}
+.drops .left{margin-left:8px;font-weight:700;font-size:.9rem}
+.gi{display:flex;align-items:center;gap:10px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px 12px;margin-bottom:8px}
+.gi .t{flex:1;font-weight:600;font-size:.95rem}
+.gi .n{min-width:1.6em;text-align:center;font:800 1.3rem var(--font-h)}
+.pm{width:46px;height:46px;border-radius:50%;border:2px solid var(--accent);background:var(--card);font-size:1.4rem;font-weight:700;color:var(--accent);line-height:1}
+.pm:disabled{opacity:.3;cursor:default}
+.sub{font:700 .95rem var(--font-h);color:var(--muted);margin:16px 0 8px}
+.locked{pointer-events:none;opacity:.55}
+.lock-msg{background:var(--accent-soft);border-radius:12px;padding:12px;font-weight:600;margin-bottom:12px;text-align:center}
+.wait{text-align:center;padding:56px 12px 24px}
+.wait .big-drop{width:56px;height:76px;margin:0 auto 22px;position:relative}
+.wait .big-drop svg{width:100%;height:100%;fill:var(--accent)}
+.wait .big-drop::after{content:"";position:absolute;inset:-14px -20px;border:2px solid var(--accent);border-radius:50%;opacity:0;animation:ring 2.6s ease-out infinite}
+@keyframes ring{0%{transform:scale(.6);opacity:.7}100%{transform:scale(1.3);opacity:0}}
+.wait h1{font-size:1.9rem;font-weight:800;margin-bottom:10px}
+.pv-foot{margin-top:24px;font-size:.8rem;color:var(--muted);text-align:center}
+
+/* ---------- écran animateur ---------- */
+.ev{font-size:clamp(15px,1.25vw,26px);height:100vh;display:flex;flex-direction:column}
+.ev-top{display:flex;align-items:center;gap:1.2em;padding:.7em 1.4em;border-bottom:1px solid var(--line);flex-wrap:wrap}
+.ev-brand{font:800 1.25em var(--font-h);display:flex;align-items:center;gap:.5em;margin-right:.6em}
+.ev-brand svg{width:.9em;height:1.2em;fill:var(--accent)}
+.ev-tabs{display:flex;gap:.4em;flex-wrap:wrap;flex:1}
+.tab{border:2px solid transparent;background:transparent;border-radius:.7em;padding:.4em .8em;font-weight:600;position:relative}
+.tab b{font-family:var(--font-h);margin-right:.35em;color:var(--accent)}
+.tab.on{background:var(--accent-soft);border-color:var(--accent)}
+.tab.live::after{content:"";position:absolute;top:.3em;right:.3em;width:.55em;height:.55em;border-radius:50%;background:var(--c-test);box-shadow:0 0 0 .2em rgba(95,174,131,.25)}
+.ev-right{display:flex;align-items:center;gap:.7em}
+.pill{background:var(--accent-soft);border-radius:999px;padding:.3em .9em;font-weight:700;white-space:nowrap}
+.ico{border:2px solid var(--line);background:var(--card);border-radius:.6em;padding:.3em .6em;font-size:1em}
+.ev-main{flex:1;overflow:auto;padding:1.4em 1.8em 2em}
+.ev-title{font-size:2.2em;font-weight:800;margin-bottom:.15em}
+.ev-lead{color:var(--muted);max-width:60em;margin-bottom:1.2em;font-size:1.05em}
+.ev-head{display:flex;justify-content:space-between;align-items:flex-start;gap:1em;flex-wrap:wrap}
+.legend{display:flex;gap:1.2em;flex-wrap:wrap;margin:.4em 0 .8em;font-size:.9em;color:var(--muted)}
+.legend i{display:inline-block;width:.8em;height:.8em;border-radius:.2em;margin-right:.4em;vertical-align:-.05em}
+.srow{display:grid;grid-template-columns:minmax(9em,27%) 1fr 7em;gap:1em;align-items:center;margin:.5em 0}
+.srow-l{font-weight:600;line-height:1.2}
+.srow-l small{display:block;color:var(--muted);font-weight:400;font-size:.8em}
+.bar{display:flex;height:2.1em;border-radius:.5em;overflow:hidden;background:var(--accent-soft)}
+.bar .fill{background:var(--accent);height:100%;transition:width .5s ease}
+.seg2{display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;transition:width .5s ease;overflow:hidden;white-space:nowrap}
+.s-oui,.s-fait{background:var(--c-oui)} .s-test{background:var(--c-test);color:#0A2A1A}
+.s-nuance,.s-cond{background:var(--c-warn);color:#2B1D00} .s-non,.s-pas{background:var(--c-no)}
+.nums{color:var(--muted);font-size:.85em;text-align:right}
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:2em}
+.cols h3{font-size:1.15em;margin:.2em 0 .6em}
+.wall{columns:2 16em;column-gap:.9em}
+.cols .wall{columns:1}
+.note{break-inside:avoid;background:var(--card);border:1px solid var(--line);border-left:.4em solid var(--c-neutral);border-radius:.6em;padding:.6em .8em;margin:0 0 .7em;position:relative}
+.note.y-si{border-left-color:var(--c-oui)} .note.y-rouge{border-left-color:var(--c-no)}
+.note .x-del{display:none;position:absolute;top:.2em;right:.3em}
+body.unlocked .note .x-del{display:block}
+.empty{color:var(--muted);font-style:italic;padding:.6em 0}
+.home{display:grid;grid-template-columns:auto 1fr;gap:3em;align-items:center;max-width:70em;margin:1em auto 0}
+.qrbox{background:#fff;border-radius:1em;padding:1em;width:min(26em,38vw);aspect-ratio:1;display:flex;align-items:center;justify-content:center;text-align:center;color:#0D2E39;word-break:break-all}
+.qrbox img,.qrbox canvas{max-width:100%;height:auto!important}
+.home h1{font-size:3em;font-weight:800;margin-bottom:.2em}
+.home .url{font-weight:700;color:var(--accent);word-break:break-all;margin:.4em 0 1.2em}
+.agenda{list-style:none;padding:0;margin:0 0 1.2em;display:grid;gap:.5em}
+.agenda li{display:flex;gap:.8em;align-items:baseline}
+.agenda b{font:800 1.2em var(--font-h);color:var(--accent);min-width:1.2em}
+.irow{display:grid;grid-template-columns:3.2em 1fr;gap:1em;align-items:center;margin:.5em 0;background:var(--card);border:1px solid var(--line);border-radius:.8em;padding:.6em .9em}
+.irow .vn{font:800 1.6em var(--font-h);color:var(--accent);text-align:center}
+.irow .bar{height:.5em;margin-top:.4em}
+.top3 .vn{color:var(--c-warn)}
+.tbl{width:100%;border-collapse:collapse;margin:.4em 0 1.4em}
+.tbl th{font-weight:600;color:var(--muted);text-align:left;padding:.4em .6em;border-bottom:2px solid var(--line);font-size:.9em}
+.tbl td{padding:.5em .6em;border-bottom:1px solid var(--line)}
+.tbl .bar{height:1.2em;min-width:8em}
+.syn{display:grid;grid-template-columns:1fr 1fr;gap:2em}
+.tag{display:inline-block;background:var(--accent-soft);border-radius:.6em;padding:.25em .7em;margin:0 .4em .4em 0;font-weight:600}
+.tag b{color:var(--accent);margin-left:.3em}
+.ev-ctl{display:flex;gap:.6em;flex-wrap:wrap;align-items:center;padding:.6em 1.4em;border-top:1px solid var(--line);background:var(--card)}
+.ev-ctl .sp{flex:1}
+.cb{border:2px solid var(--line);background:var(--card);border-radius:.6em;padding:.4em .9em;font-weight:600;font-size:.9em}
+.cb.pri{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
+.cb.danger{border-color:var(--c-no);color:var(--c-no)}
+.cb.on{background:var(--accent-soft);border-color:var(--accent)}
+.ctl-tag{font-size:.8em;color:var(--muted);font-weight:600}
+@media (max-width:900px){.cols,.syn,.home{grid-template-columns:1fr}.srow{grid-template-columns:1fr}.nums{text-align:left}.qrbox{width:70vw}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+<div id="app"><noscript>Cette page a besoin de JavaScript.</noscript></div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script>
+(function(){
+'use strict';
+
+/* =====================================================================
+   CONFIGURATION — tout ce qui se modifie est ici
+   ===================================================================== */
+const CONFIG = {
+  // Nom de la session dans Firebase. Changez-le pour repartir d'une page blanche
+  // (ex. "bar-sur-seine-test" pour vous entraîner, "bar-sur-seine-2026" le jour J).
+  session: "bar-sur-seine-2026",
+
+  // Code demandé pour débloquer les commandes sur l'écran animateur (?ecran).
+  // Ce n'est pas une vraie sécurité : il évite juste les fausses manips.
+  pin: "1234",
+
+  titre: "AAC de Bar-sur-Seine",
+  accroche: "Notre eau, notre plan d'action",
+  jetons: 5,               // nombre de gouttes à répartir (atelier 5)
+  maxFreins: 3,            // nombre de freins choisis (atelier 3)
+
+  // Collez ici la config Firebase (Realtime Database). Laissez null = mode démo local.
+  // firebase: { apiKey:"…", authDomain:"…", databaseURL:"https://….firebasedatabase.app", projectId:"…", appId:"…" },
+  firebase: null,
+
+  // Atelier 1 : les pressions identifiées par le DTPA (adaptez à votre diagnostic)
+  themes: [
+    {k:"azote",    label:"Fertilisation azotée",            desc:"Doses, dates d'apport, fractionnement, reliquats"},
+    {k:"herbi",    label:"Herbicides",                      desc:"Molécules, périodes d'application, parcelles concernées"},
+    {k:"phyto",    label:"Autres produits phytosanitaires", desc:"Fongicides, insecticides, traitements de semences"},
+    {k:"sols",     label:"Sols nus et intercultures",       desc:"Lessivage hivernal, couverture des sols"},
+    {k:"transfert",label:"Transferts rapides vers la ressource", desc:"Ruissellement, drainage, zones vulnérables"},
+    {k:"ponctuel", label:"Pollutions ponctuelles",          desc:"Remplissage, rinçage, fonds de cuve, stockage"}
+  ],
+
+  // Atelier 2 & 5 : les pistes d'action
+  leviers: [
+    {k:"couverts",  label:"Couverts d'interculture réussis",             desc:"Longs, multi-espèces, semés tôt"},
+    {k:"azote",     label:"Ajuster et fractionner l'azote",              desc:"Reliquats, outils de pilotage, modulation"},
+    {k:"meca",      label:"Désherbage mécanique",                        desc:"Herse étrille, houe rotative, bineuse"},
+    {k:"ift",       label:"Programmes phyto allégés",                    desc:"Réduction de doses et d'IFT herbicides"},
+    {k:"biocontrole",label:"Biocontrôle et alternatives",                desc:"Produits de biocontrôle, leviers agronomiques"},
+    {k:"aire",      label:"Aire de remplissage et de lavage",            desc:"Individuelle ou collective, gestion des effluents"},
+    {k:"tampon",    label:"Zones tampons sur parcelles à risque",        desc:"Bandes enherbées, haies, fossés végétalisés"},
+    {k:"rotation",  label:"Allonger et diversifier la rotation",         desc:"Cultures de printemps, légumineuses"},
+    {k:"bas",       label:"Cultures bas-intrants sur zones sensibles",   desc:"Luzerne, prairie, chanvre"},
+    {k:"precision", label:"Pulvérisation de précision",                  desc:"Coupure de tronçons, buses anti-dérive, localisé"}
+  ],
+
+  // Atelier 3 : les freins
+  freins: [
+    {k:"eco",     label:"Coût et revenu"},
+    {k:"rdt",     label:"Risque sur le rendement"},
+    {k:"temps",   label:"Temps de travail, pointes"},
+    {k:"materiel",label:"Matériel et investissement"},
+    {k:"refs",    label:"Manque de références locales"},
+    {k:"admin",   label:"Lourdeur administrative et contrôles"},
+    {k:"filiere", label:"Débouchés et cahiers des charges"},
+    {k:"climat",  label:"Aléas climatiques"},
+    {k:"equite",  label:"Les autres usagers font-ils leur part ?"},
+    {k:"regard",  label:"Le regard extérieur"}
+  ]
+};
+
+const J = CONFIG.jetons;
+const ATELIERS = [
+  {id:"a1", n:1, court:"Diagnostic", titre:"Le diagnostic vu du terrain",
+   consigne:"Le diagnostic a repéré des pressions sur le territoire. Pour chacune, est-ce ce que vous constatez ?"},
+  {id:"a2", n:2, court:"Envies", titre:"Mon panier d'actions",
+   consigne:"Pour chaque piste, dites où vous en êtes. « Déjà en place » compte autant que « prêt à tester »."},
+  {id:"a3", n:3, court:"Limites", titre:"Mes conditions et mes limites",
+   consigne:"Choisissez jusqu'à "+CONFIG.maxFreins+" freins, puis dites ce qui vous ferait avancer et ce que vous ne pouvez pas accepter."},
+  {id:"a4", n:4, court:"Idées", titre:"La boîte à idées",
+   consigne:"Proposez une action (3 maximum) et soutenez celles des autres avec le pouce."},
+  {id:"a5", n:5, court:"Priorités", titre:"Mes "+J+" gouttes",
+   consigne:"Vous avez "+J+" gouttes. Placez-les sur ce qui compte le plus pour le plan d'action, même toutes sur la même piste."}
+];
+
+const A1_OPTS = [{v:"oui",t:"Je m'y retrouve",name:"Je m'y retrouve"},{v:"nuance",t:"À nuancer",name:"À nuancer"},{v:"non",t:"Pas chez moi",name:"Pas ce que je constate"}];
+const A2_OPTS = [{v:"fait",t:"Déjà en place",name:"Déjà en place"},{v:"test",t:"Prêt à tester",name:"Prêt à tester"},{v:"cond",t:"Sous conditions",name:"Sous conditions"},{v:"pas",t:"Pas pour moi",name:"Pas pour moi"}];
+
+/* =====================================================================
+   Utilitaires
+   ===================================================================== */
+const $ = (s,r)=> (r||document).querySelector(s);
+const DROP_SVG = '<svg viewBox="0 0 24 32" aria-hidden="true"><path d="M12 1C12 1 2 14 2 21a10 10 0 0 0 20 0C22 14 12 1 12 1z"/></svg>';
+function h(tag, attrs){
+  const el = document.createElement(tag);
+  if(attrs) for(const k in attrs){
+    const v = attrs[k];
+    if(v==null || v===false) continue;
+    if(k==="class") el.className = v;
+    else if(k==="html") el.innerHTML = v;            // uniquement du SVG interne statique
+    else if(k.slice(0,2)==="on") el.addEventListener(k.slice(2), v);
+    else el.setAttribute(k, v===true ? "" : v);
+  }
+  const kids = Array.prototype.slice.call(arguments, 2);
+  kids.flat().forEach(c=>{ if(c==null||c===false) return; el.append(c.nodeType ? c : String(c)); });
+  return el;
+}
+const fill = (parent, ...kids)=> parent.replaceChildren(...kids.flat().filter(k=>k!=null && k!==false));
+const byTsAsc = (a,b)=> (a.ts||0)-(b.ts||0);
+const byTsDesc = (a,b)=> (b.ts||0)-(a.ts||0);
+const plural = (n,s,p)=> n+" "+(n>1?(p||s+"s"):s);
+let toastTimer;
+function toast(msg){
+  const old = $(".toast"); if(old) old.remove();
+  const t = h("div",{class:"toast",role:"status"},msg); document.body.append(t);
+  clearTimeout(toastTimer); toastTimer = setTimeout(()=>t.remove(), 2400);
+}
+function keyed(container){
+  const map = new Map();
+  return function sync(items, create, update){
+    const seen = new Set();
+    items.forEach((it,i)=>{
+      seen.add(it.k);
+      let r = map.get(it.k);
+      if(!r){ r = create(it); map.set(it.k, r); }
+      update(r, it, i);
+      if(container.children[i] !== r.el) container.insertBefore(r.el, container.children[i]||null);
+    });
+    Array.from(map.keys()).forEach(k=>{ if(!seen.has(k)){ map.get(k).el.remove(); map.delete(k); } });
+  };
+}
+
+/* =====================================================================
+   Couche de données : Firebase Realtime Database, ou mode démo local
+   ===================================================================== */
+function setPath(obj, path, val){
+  const parts = path.split("/").filter(Boolean); let o = obj; const stack = [obj];
+  for(let i=0;i<parts.length-1;i++){
+    if(typeof o[parts[i]] !== "object" || o[parts[i]]===null) o[parts[i]] = {};
+    o = o[parts[i]]; stack.push(o);
+  }
+  const last = parts[parts.length-1];
+  if(val===null || val===undefined){
+    delete o[last];
+    for(let i=stack.length-1;i>0;i--){            // comme Firebase : un noeud vide disparaît
+      if(Object.keys(stack[i]).length===0) delete stack[i-1][parts[i-1]]; else break;
+    }
+  } else o[last] = val;
+}
+function loadScript(src){
+  return new Promise((res,rej)=>{
+    const s = document.createElement("script"); s.src = src; s.onload = res;
+    s.onerror = ()=> rej(new Error("Chargement impossible : "+src)); document.head.appendChild(s);
+  });
+}
+async function firebaseStore(){
+  const v = "10.12.5";
+  await loadScript("https://www.gstatic.com/firebasejs/"+v+"/firebase-app-compat.js");
+  await loadScript("https://www.gstatic.com/firebasejs/"+v+"/firebase-database-compat.js");
+  firebase.initializeApp(CONFIG.firebase);
+  const root = firebase.database().ref("aac/"+CONFIG.session);
+  return {
+    mode:"firebase",
+    subscribe(cb){ root.on("value", s=> cb(s.val()||{})); },
+    set(path,val){ return root.child(path).set(val===undefined?null:val); },
+    push(path,val){ const r = root.child(path).push(); r.set(val); return r.key; },
+    remove(path){ return root.child(path).remove(); },
+    update(map){ return root.update(map); },
+    clear(){ return root.remove(); }
+  };
+}
+function localStore(){
+  const key = "aac_demo_"+CONFIG.session;
+  let mem = {}, useMem = false; const listeners = [];
+  const read = ()=>{ if(useMem) return mem; try{ return JSON.parse(localStorage.getItem(key))||{}; }catch(e){ useMem = true; return mem; } };
+  const save = d=>{ if(useMem){ mem = d; return; } try{ localStorage.setItem(key, JSON.stringify(d)); }catch(e){ useMem = true; mem = d; } };
+  const emit = ()=>{ const d = read(); listeners.forEach(f=>f(d)); };
+  window.addEventListener("storage", e=>{ if(e.key===key) emit(); });
+  const write = fn=>{ const d = read(); fn(d); save(d); emit(); };
+  return {
+    mode:"demo",
+    subscribe(cb){ listeners.push(cb); cb(read()); },
+    set(path,val){ write(d=>setPath(d,path,val)); },
+    push(path,val){ const k = "k"+Date.now().toString(36)+Math.random().toString(36).slice(2,6); write(d=>setPath(d,path+"/"+k,val)); return k; },
+    remove(path){ write(d=>setPath(d,path,null)); },
+    update(map){ write(d=>{ for(const p in map) setPath(d,p,map[p]); }); },
+    clear(){ write(d=>{ for(const k in d) delete d[k]; }); }
+  };
+}
+function deviceId(){
+  const k = "aac_dev_"+CONFIG.session;
+  try{
+    let d = localStorage.getItem(k);
+    if(!d){ d = Math.random().toString(36).slice(2,10)+Date.now().toString(36).slice(-4); localStorage.setItem(k,d); }
+    return d;
+  }catch(e){ return window.__dev || (window.__dev = Math.random().toString(36).slice(2,10)); }
+}
+
+/* =====================================================================
+   État partagé et agrégats
+   ===================================================================== */
+const params = new URLSearchParams(location.search);
+const isEcran = params.has("ecran");
+const dev = deviceId();
+let store, S = {};
+const etat = ()=> Object.assign({actif:0,libre:false,clos:false}, S.etat||{});
+function tally(section,key){
+  const out = {};
+  Object.values(S[section]||{}).forEach(m=>{ const v = m && m[key]; if(v) out[v] = (out[v]||0)+1; });
+  return out;
+}
+function freinCount(k){ return Object.values(S.a3f||{}).filter(m=>m&&m[k]).length; }
+function notesOf(a,y){
+  return Object.entries(S.notes||{}).map(([id,n])=>Object.assign({k:id,id},n)).filter(n=>n.a===a && (!y||n.y===y));
+}
+function myNotes(a){ return notesOf(a).filter(n=>n.d===dev).sort(byTsAsc); }
+function ideas(){
+  return Object.entries(S.idees||{}).map(([id,o])=>Object.assign({k:id,id,votes:Object.keys((S.votes||{})[id]||{}).length},o));
+}
+function items5(){
+  const p = CONFIG.leviers.map(l=>({k:l.k,label:l.label,type:"piste"}));
+  const i = ideas().sort(byTsAsc).map(x=>({k:"i_"+x.id,label:x.t,type:"idee"}));
+  return p.concat(i);
+}
+function gouttes(k){ let n=0; Object.values(S.a5||{}).forEach(m=>{ if(m && m[k]) n += m[k]; }); return n; }
+function respondents(id){
+  const u = new Set();
+  if(id==="a1"||id==="a2"||id==="a5") Object.keys(S[id]||{}).forEach(d=>u.add(d));
+  if(id==="a3"){ Object.keys(S.a3f||{}).forEach(d=>u.add(d)); notesOf("a3").forEach(n=>u.add(n.d)); }
+  if(id==="a4"){ ideas().forEach(i=>u.add(i.d)); Object.values(S.votes||{}).forEach(v=>Object.keys(v||{}).forEach(d=>u.add(d))); }
+  return u.size;
+}
+function choose(sec,key,val){
+  const cur = ((S[sec]||{})[dev]||{})[key];
+  store.set(sec+"/"+dev+"/"+key, cur===val ? null : val);
+}
+
+/* =====================================================================
+   VUE PARTICIPANT
+   ===================================================================== */
+function noteForm(o){
+  let cur = o.types[0].y;
+  const ta = h("textarea",{maxlength:200,rows:3,placeholder:o.placeholder,"aria-label":o.placeholder});
+  const segBtns = o.types.map(t=> h("button",{type:"button",class:"seg "+(t.cls||""),onclick:()=>{ cur = t.y; mark(); }}, h("span",{class:"dot"}), t.label));
+  const send = h("button",{type:"button",class:"btn primary",onclick:()=>{
+    const t = ta.value.trim();
+    if(t.length<3) return toast("Écrivez quelques mots");
+    if(myNotes(o.a).length >= o.max) return toast(o.max+" contributions maximum dans cet atelier");
+    store.push("notes",{d:dev,a:o.a,y:cur,t:t.slice(0,200),ts:Date.now()});
+    ta.value = ""; toast("Merci, c'est envoyé");
+  }},"Envoyer");
+  const mine = h("div",{class:"mine"});
+  function mark(){ segBtns.forEach((b,i)=> b.classList.toggle("on", o.types[i].y===cur)); }
+  mark();
+  function update(){
+    mine.replaceChildren(...myNotes(o.a).map(n=> h("div",{class:"mynote "+n.y}, h("span",null,n.t),
+      h("button",{class:"x","aria-label":"Retirer ma contribution",onclick:()=>store.remove("notes/"+n.id)},"✕"))));
+  }
+  const el = h("div",null, o.types.length>1 ? h("div",{class:"segs"},segBtns) : null, ta, send, mine);
+  return {el, update};
+}
+
+function buildChoiceAtelier(sec, list, opts, cls){
+  const rows = list.map(it=>{
+    const btns = opts.map(o=> h("button",{type:"button",class:"opt","data-v":o.v,onclick:()=>choose(sec,it.k,o.v)},o.t));
+    const card = h("div",{class:"card"}, h("h3",null,it.label), it.desc ? h("p",{class:"hint"},it.desc) : null, h("div",{class:"opts "+cls},btns));
+    return {it,btns,card};
+  });
+  return {rows};
+}
+
+function buildA1(){
+  const {rows} = buildChoiceAtelier("a1", CONFIG.themes, A1_OPTS, "three");
+  const nf = noteForm({a:"a1",max:3,types:[{y:"manque",label:"Ce qui manque ou ne colle pas"}],placeholder:"Ce que le diagnostic ne dit pas, ou dit mal…"});
+  const el = h("div",null, rows.map(r=>r.card),
+    h("div",{class:"card"}, h("h3",null,"Il manque quelque chose ?"), h("p",{class:"hint"},"Une pression oubliée, une donnée qui ne colle pas avec le terrain."), nf.el));
+  function update(){
+    const mine = (S.a1||{})[dev]||{};
+    rows.forEach(r=> r.btns.forEach(b=> b.classList.toggle("on", mine[r.it.k]===b.dataset.v)));
+    nf.update();
+  }
+  return {el, update};
+}
+function buildA2(){
+  const {rows} = buildChoiceAtelier("a2", CONFIG.leviers, A2_OPTS, "four");
+  const el = h("div",null, rows.map(r=>r.card));
+  function update(){
+    const mine = (S.a2||{})[dev]||{};
+    rows.forEach(r=> r.btns.forEach(b=> b.classList.toggle("on", mine[r.it.k]===b.dataset.v)));
+  }
+  return {el, update};
+}
+function buildA3(){
+  const chips = CONFIG.freins.map(f=> h("button",{type:"button",class:"chip",onclick:()=>{
+    const mine = (S.a3f||{})[dev]||{};
+    if(!mine[f.k] && Object.keys(mine).length>=CONFIG.maxFreins) return toast(CONFIG.maxFreins+" freins au maximum : retirez-en un d'abord");
+    store.set("a3f/"+dev+"/"+f.k, mine[f.k] ? null : true);
+  }},f.label));
+  const nf = noteForm({a:"a3",max:4,placeholder:"Écrivez sans nom ni commune, une phrase suffit…",types:[
+    {y:"si",cls:"g",label:"Je serais prêt à avancer si…"},
+    {y:"rouge",cls:"r",label:"Ma ligne rouge, c'est…"}]});
+  const el = h("div",null,
+    h("div",{class:"card"}, h("h3",null,"Ce qui me freine le plus"), h("p",{class:"hint"},"Jusqu'à "+CONFIG.maxFreins+" choix."), h("div",{class:"chips"},chips)),
+    h("div",{class:"card"}, h("h3",null,"Dans mes mots"), nf.el));
+  function update(){
+    const mine = (S.a3f||{})[dev]||{};
+    chips.forEach((c,i)=> c.classList.toggle("on", !!mine[CONFIG.freins[i].k]));
+    nf.update();
+  }
+  return {el, update};
+}
+function buildA4(){
+  const ta = h("textarea",{maxlength:140,rows:2,placeholder:"Une action, une règle, un coup de pouce…","aria-label":"Votre idée"});
+  const send = h("button",{type:"button",class:"btn primary",onclick:()=>{
+    const t = ta.value.trim();
+    if(t.length<4) return toast("Décrivez votre idée en quelques mots");
+    if(ideas().filter(i=>i.d===dev).length>=3) return toast("3 idées maximum par personne");
+    store.push("idees",{d:dev,t:t.slice(0,140),ts:Date.now()});
+    ta.value = ""; toast("Idée ajoutée à la boîte");
+  }},"Proposer mon idée");
+  const list = h("div");
+  function update(){
+    const arr = ideas().sort(byTsDesc);
+    if(!arr.length){ list.replaceChildren(h("p",{class:"hint"},"Pas encore d'idée. Lancez-vous !")); return; }
+    list.replaceChildren(...arr.map(i=>{
+      const voted = ((S.votes||{})[i.id]||{})[dev];
+      return h("div",{class:"idea"},
+        h("button",{type:"button",class:"vote"+(voted?" on":""),"aria-label":"Soutenir cette idée",onclick:()=>store.set("votes/"+i.id+"/"+dev, voted?null:true)},
+          h("span",null,"👍"), h("span",null,i.votes)),
+        h("p",null,i.t),
+        i.d===dev ? h("button",{class:"x","aria-label":"Retirer mon idée",onclick:()=>{ store.remove("idees/"+i.id); store.remove("votes/"+i.id); }},"✕") : null);
+    }));
+  }
+  const el = h("div",null, h("div",{class:"card"}, h("h3",null,"Ma proposition"), ta, send), h("div",{class:"sub"},"Les idées du groupe"), list);
+  return {el, update};
+}
+function buildA5(){
+  const box = h("div",{class:"drops"});
+  const list = h("div");
+  function update(){
+    const items = items5(); const valid = new Set(items.map(i=>i.k));
+    const mine = (S.a5||{})[dev]||{};
+    let used = 0; for(const k in mine) if(valid.has(k)) used += mine[k];
+    const left = J-used;
+    box.replaceChildren(
+      ...Array.from({length:J},(_,i)=> h("span",{class:"drop"+(i<left?" full":""),html:DROP_SVG})),
+      h("span",{class:"left"}, left>0 ? plural(left,"goutte")+" à placer" : "Toutes vos gouttes sont placées"));
+    const row = it=>{
+      const n = mine[it.k]||0;
+      return h("div",{class:"gi"},
+        h("div",{class:"t"},it.label),
+        h("button",{type:"button",class:"pm","aria-label":"Retirer une goutte",disabled:n===0,onclick:()=>store.set("a5/"+dev+"/"+it.k, n-1>0?n-1:null)},"−"),
+        h("span",{class:"n"},n),
+        h("button",{type:"button",class:"pm","aria-label":"Ajouter une goutte",disabled:left===0,onclick:()=>store.set("a5/"+dev+"/"+it.k, n+1)},"+"));
+    };
+    const pistes = items.filter(i=>i.type==="piste"), idees = items.filter(i=>i.type==="idee");
+    list.replaceChildren(h("div",{class:"sub"},"Les pistes"), ...pistes.map(row),
+      ...(idees.length ? [h("div",{class:"sub"},"Les idées du groupe"), ...idees.map(row)] : []));
+  }
+  return {el:h("div",null,box,list), update};
+}
+const P_BUILDERS = [buildA1,buildA2,buildA3,buildA4,buildA5];
+
+let pv = {shell:null, current:-1, view:null, tab:0};
+function pvShell(){
+  const app = $("#app"); app.className = "pv"; app.replaceChildren();
+  pv.step = h("span",{class:"pv-step"});
+  pv.tabs = h("nav",{class:"pv-tabs",hidden:true,"aria-label":"Ateliers"});
+  pv.main = h("main");
+  fill(app,
+    store.mode==="demo" ? h("div",{class:"demo-flag"},"Mode démo : données enregistrées sur cet appareil seulement") : null,
+    h("header",{class:"pv-head"}, h("div",{class:"pv-brand",html:DROP_SVG+"<span></span>"}), pv.step),
+    pv.tabs, pv.main,
+    h("p",{class:"pv-foot"},"Participation anonyme. Aucune donnée personnelle n'est demandée : ne mettez ni nom ni commune dans vos textes."));
+  $(".pv-brand span").textContent = CONFIG.titre;
+  ATELIERS.forEach(a=> pv.tabs.append(h("button",{type:"button","data-n":a.n,onclick:()=>{ pv.tab = a.n; pvUpdate(); }}, a.n+" "+a.court)));
+  pv.shell = true;
+}
+function pvBuild(n){
+  pv.main.replaceChildren();
+  if(n===0){
+    pv.view = null;
+    pv.main.append(h("div",{class:"wait"}, h("div",{class:"big-drop",html:DROP_SVG}), h("h1",null,CONFIG.accroche),
+      h("p",{class:"pv-lead"},"Vous êtes bien connecté. L'animateur ouvrira le premier atelier dans un instant : cet écran changera tout seul.")));
+    return;
+  }
+  const a = ATELIERS[n-1]; const b = P_BUILDERS[n-1]();
+  pv.lock = h("div",{class:"lock-msg",hidden:true},"Les réponses sont closes pour cet atelier. Merci !");
+  pv.body = h("div",null,b.el);
+  pv.main.append(h("h2",{class:"pv-title"},a.titre), h("p",{class:"pv-lead"},a.consigne), pv.lock, pv.body);
+  pv.view = b;
+}
+function pvUpdate(){
+  if(!pv.shell) return;
+  const e = etat();
+  let n = e.libre ? (pv.tab || e.actif || 1) : (e.actif||0);
+  pv.tabs.hidden = !e.libre;
+  Array.from(pv.tabs.children).forEach(b=> b.classList.toggle("on", Number(b.dataset.n)===n));
+  if(n!==pv.current){ pvBuild(n); pv.current = n; window.scrollTo(0,0); }
+  pv.step.textContent = n ? "Atelier "+n+" sur "+ATELIERS.length : "";
+  if(pv.view){
+    pv.view.update();
+    const locked = e.clos && !e.libre;
+    pv.lock.hidden = !locked; pv.body.classList.toggle("locked", locked);
+  }
+}
+
+/* =====================================================================
+   VUE ÉCRAN ANIMATEUR (?ecran)
+   ===================================================================== */
+let unlocked = false;
+try{ unlocked = sessionStorage.getItem("aac_unlock")==="1"; }catch(e){}
+let ev = {tab:"home", view:null, theme:"dark"};
+try{ ev.theme = localStorage.getItem("aac_theme")||"dark"; }catch(e){}
+
+const TABS = [{id:"home",label:"Accueil"}].concat(ATELIERS.map(a=>({id:a.id,n:a.n,label:a.court})),[{id:"synth",label:"Synthèse"}]);
+const participantUrl = ()=> location.href.split(/[?#]/)[0];
+
+function legend(list){
+  return h("div",{class:"legend"}, list.map(o=> h("span",null, h("i",{class:"s-"+o.v}), o.name)));
+}
+function makeStack(label, opts){
+  const segs = opts.map(o=> h("span",{class:"seg2 s-"+o.v,title:o.name}));
+  const nums = h("span",{class:"nums"});
+  const el = h("div",{class:"srow"}, h("div",{class:"srow-l"},label), h("div",{class:"bar"},segs), nums);
+  return {el, set(c){
+    const tot = opts.reduce((s,o)=>s+(c[o.v]||0),0);
+    segs.forEach((s,i)=>{ const n = c[opts[i].v]||0; s.style.width = tot ? (n/tot*100)+"%" : "0%"; s.textContent = n>0 ? n : ""; });
+    nums.textContent = tot ? plural(tot,"réponse") : "—";
+  }};
+}
+function makeBar(label, sub){
+  const fill = h("div",{class:"fill"}); const nums = h("span",{class:"nums"});
+  const l = h("div",{class:"srow-l"}, label, sub ? h("small",null,sub) : null);
+  return {el:h("div",{class:"srow"}, l, h("div",{class:"bar"},fill), nums), fill, nums, label:l};
+}
+function notesWall(a,y){
+  const wall = h("div",{class:"wall"}); const sync = keyed(wall);
+  const empty = h("p",{class:"empty"},"En attente de contributions…");
+  const el = h("div",null,wall,empty);
+  function update(){
+    const arr = notesOf(a,y).sort(byTsDesc);
+    empty.hidden = arr.length>0;
+    sync(arr, it=> ({el:h("div",{class:"note y-"+it.y}, h("p",null,it.t),
+        h("button",{class:"x x-del","aria-label":"Masquer",onclick:()=>store.remove("notes/"+it.id)},"✕"))}), ()=>{});
+  }
+  return {el, update};
+}
+function evHead(a){
+  const count = h("span",{class:"pill"});
+  return {el:h("div",null, h("div",{class:"ev-head"}, h("h1",{class:"ev-title"},a.n+". "+a.titre), count), h("p",{class:"ev-lead"},a.consigne)),
+          update(){ const n = respondents(a.id); count.textContent = n ? n+(n>1?" personnes ont répondu":" personne a répondu") : "Pas encore de réponse"; }};
+}
+
+function viewHome(){
+  const box = h("div",{class:"qrbox"});
+  const url = participantUrl();
+  if(typeof QRCode!=="undefined"){
+    try{ new QRCode(box,{text:url,width:360,height:360,colorDark:"#0D2E39",colorLight:"#ffffff",correctLevel:QRCode.CorrectLevel.M}); }
+    catch(e){ box.textContent = url; }
+  } else box.textContent = url;
+  const status = h("p",{class:"hint"});
+  const el = h("div",{class:"home"}, box, h("div",null,
+    h("h1",null,CONFIG.accroche),
+    h("p",{class:"ev-lead"},"Flashez le code avec l'appareil photo de votre téléphone. Participation anonyme, aucune inscription."),
+    h("p",{class:"url"},url.replace(/^https?:\/\//,"")),
+    h("ol",{class:"agenda"},ATELIERS.map(a=> h("li",null,h("b",null,a.n),h("span",null,a.titre)))), status));
+  return {el, update(){
+    const e = etat();
+    status.textContent = e.libre ? "Les participants naviguent librement entre les ateliers." : (e.actif ? "Atelier "+e.actif+" ouvert aux participants." : "Les participants sont en attente.");
+  }};
+}
+function viewA1(){
+  const head = evHead(ATELIERS[0]); const list = h("div"); const sync = keyed(list);
+  const wall = notesWall("a1","manque");
+  const el = h("div",null, head.el, legend(A1_OPTS), list, h("h3",{class:"sub",style:"margin-top:1.4em"},"Ce qui manque ou ne colle pas"), wall.el);
+  return {el, update(){
+    head.update();
+    sync(CONFIG.themes.map(t=>({k:t.k,t})), it=>makeStack(it.t.label,A1_OPTS), (r,it)=> r.set(tally("a1",it.k)));
+    wall.update();
+  }};
+}
+function viewA2(){
+  const head = evHead(ATELIERS[1]); const list = h("div"); const sync = keyed(list);
+  const el = h("div",null, head.el, legend(A2_OPTS), list);
+  return {el, update(){
+    head.update();
+    sync(CONFIG.leviers.map(l=>({k:l.k,l})), it=>makeStack(it.l.label,A2_OPTS), (r,it)=> r.set(tally("a2",it.k)));
+  }};
+}
+function viewA3(){
+  const head = evHead(ATELIERS[2]); const list = h("div"); const sync = keyed(list);
+  const w1 = notesWall("a3","si"), w2 = notesWall("a3","rouge");
+  const el = h("div",null, head.el, h("div",{class:"cols"},
+    h("div",null,h("h3",null,"Ce qui freine le plus"),list),
+    h("div",null,h("h3",null,"Je serais prêt à avancer si…"),w1.el,h("h3",{style:"margin-top:1.2em"},"Ma ligne rouge, c'est…"),w2.el)));
+  return {el, update(){
+    head.update();
+    const tot = Math.max(1,respondents("a3"));
+    const arr = CONFIG.freins.map(f=>({k:f.k,f,n:freinCount(f.k)})).sort((a,b)=>b.n-a.n);
+    sync(arr, it=>makeBar(it.f.label), (r,it)=>{ r.fill.style.width = (it.n/Math.max(1,arr[0].n)*100)+"%"; r.nums.textContent = it.n; });
+    w1.update(); w2.update();
+  }};
+}
+function viewA4(){
+  const head = evHead(ATELIERS[3]); const list = h("div"); const sync = keyed(list);
+  const empty = h("p",{class:"empty"},"En attente d'idées…");
+  const el = h("div",null, head.el, list, empty);
+  return {el, update(){
+    head.update();
+    const arr = ideas().sort((a,b)=>b.votes-a.votes||a.ts-b.ts); const max = Math.max(1,arr.length?arr[0].votes:1);
+    empty.hidden = arr.length>0;
+    sync(arr, it=>{
+      const vn = h("div",{class:"vn"}), p = h("p"), fill = h("div",{class:"fill"});
+      return {el:h("div",{class:"irow"},vn,h("div",null,p,h("div",{class:"bar"},fill))), vn, p, fill};
+    }, (r,it,i)=>{ r.vn.textContent = it.votes; r.p.textContent = it.t; r.fill.style.width = (it.votes/max*100)+"%"; r.el.classList.toggle("top3", i<3 && it.votes>0); });
+  }};
+}
+function viewA5(){
+  const head = evHead(ATELIERS[4]); const list = h("div"); const sync = keyed(list);
+  const el = h("div",null, head.el, list);
+  return {el, update(){
+    head.update();
+    const arr = items5().map(i=>Object.assign({n:gouttes(i.k)},i)).sort((a,b)=>b.n-a.n);
+    const max = Math.max(1,arr.length?arr[0].n:1);
+    sync(arr, it=>makeBar(it.label), (r,it,i)=>{
+      r.label.firstChild.textContent = it.label + (it.type==="idee" ? " (idée du groupe)" : "");
+      r.fill.style.width = (it.n/max*100)+"%"; r.nums.textContent = plural(it.n,"goutte");
+    });
+  }};
+}
+function leverStats(l){
+  const t = tally("a2",l.k); const tot = (t.fait||0)+(t.test||0)+(t.cond||0)+(t.pas||0);
+  return {l,t,tot,g:gouttes(l.k),elan:tot?((t.fait||0)+(t.test||0))/tot:0};
+}
+function viewSynth(){
+  const el = h("div");
+  return {el, update(){
+    const st = CONFIG.leviers.map(leverStats).sort((a,b)=>b.g-a.g||b.elan-a.elan);
+    const pct = (n,tot)=> tot? Math.round(n/tot*100)+" %" : "—";
+    const table = h("table",{class:"tbl"}, h("thead",null,h("tr",null,
+      h("th",null,"Piste"), A2_OPTS.map(o=>h("th",null,o.t)), h("th",null,"Gouttes"))),
+      h("tbody",null, st.map(s=> h("tr",null, h("td",null,h("strong",null,s.l.label)),
+        A2_OPTS.map(o=> h("td",null,pct(s.t[o.v]||0,s.tot))), h("td",null,h("strong",null,s.g))))));
+    const freins = CONFIG.freins.map(f=>({f,n:freinCount(f.k)})).sort((a,b)=>b.n-a.n).filter(x=>x.n>0).slice(0,5);
+    const themes = CONFIG.themes.map(t=>{ const c = tally("a1",t.k); const tot=(c.oui||0)+(c.nuance||0)+(c.non||0); return {t,c,tot,p:tot?(c.oui||0)/tot:0}; })
+      .filter(x=>x.tot>0).sort((a,b)=>b.p-a.p).slice(0,3);
+    const rouges = notesOf("a3","rouge").sort(byTsDesc).slice(0,6);
+    const conds = notesOf("a3","si").sort(byTsDesc).slice(0,6);
+    const idees = ideas().sort((a,b)=>b.votes-a.votes).slice(0,5);
+    el.replaceChildren(
+      h("div",{class:"ev-head"}, h("h1",{class:"ev-title"},"Matière première du plan d'action"), h("span",{class:"pill"},plural(Object.keys(S.part||{}).length,"participant"))),
+      h("p",{class:"ev-lead"},"Ce que le groupe a exprimé, prêt à être transformé en actions. Les gouttes départagent, les colonnes de gauche disent où l'on en est."),
+      h("h3",{class:"sub"},"Les pistes, classées par gouttes"), table,
+      h("div",{class:"syn"},
+        h("div",null,
+          h("h3",{class:"sub"},"Pressions les plus reconnues dans le diagnostic"),
+          themes.length ? themes.map(x=>h("span",{class:"tag"},x.t.label,h("b",null,Math.round(x.p*100)+" %"))) : h("p",{class:"empty"},"—"),
+          h("h3",{class:"sub"},"Freins qui reviennent"),
+          freins.length ? freins.map(x=>h("span",{class:"tag"},x.f.label,h("b",null,x.n))) : h("p",{class:"empty"},"—"),
+          h("h3",{class:"sub"},"Idées les plus soutenues"),
+          idees.length ? idees.map(i=>h("div",{class:"note"},h("p",null,i.t+"  ("+plural(i.votes,"soutien")+")"))) : h("p",{class:"empty"},"—")),
+        h("div",null,
+          h("h3",{class:"sub"},"Je serais prêt à avancer si…"),
+          conds.length ? conds.map(n=>h("div",{class:"note y-si"},h("p",null,n.t))) : h("p",{class:"empty"},"—"),
+          h("h3",{class:"sub"},"Lignes rouges"),
+          rouges.length ? rouges.map(n=>h("div",{class:"note y-rouge"},h("p",null,n.t))) : h("p",{class:"empty"},"—"))));
+  }};
+}
+const E_BUILDERS = {home:viewHome,a1:viewA1,a2:viewA2,a3:viewA3,a4:viewA4,a5:viewA5,synth:viewSynth};
+
+/* ---- exports ---- */
+function csv(rows){
+  return "\ufeff"+rows.map(r=>r.map(c=>{ c = String(c==null?"":c); return /[";\n\r]/.test(c) ? '"'+c.replace(/"/g,'""')+'"' : c; }).join(";")).join("\r\n");
+}
+function download(name,text,mime){
+  const a = h("a",{href:URL.createObjectURL(new Blob([text],{type:mime||"text/csv;charset=utf-8"})),download:name});
+  document.body.append(a); a.click(); a.remove();
+}
+const today = ()=> new Date().toISOString().slice(0,10);
+function exportChiffres(){
+  const rows = [["atelier","element","mesure","valeur"]];
+  CONFIG.themes.forEach(t=>{ const c = tally("a1",t.k); A1_OPTS.forEach(o=>rows.push(["1 Diagnostic",t.label,o.name,c[o.v]||0])); });
+  CONFIG.leviers.forEach(l=>{ const c = tally("a2",l.k); A2_OPTS.forEach(o=>rows.push(["2 Panier d'actions",l.label,o.name,c[o.v]||0])); });
+  CONFIG.freins.forEach(f=> rows.push(["3 Freins",f.label,"personnes",freinCount(f.k)]));
+  ideas().forEach(i=> rows.push(["4 Idées",i.t,"soutiens",i.votes]));
+  items5().forEach(i=> rows.push(["5 Gouttes",i.label,"gouttes",gouttes(i.k)]));
+  download("aac-chiffres-"+today()+".csv", csv(rows));
+}
+function exportVerbatims(){
+  const lab = {manque:"Ce qui manque",si:"Prêt à avancer si",rouge:"Ligne rouge"};
+  const rows = [["atelier","type","texte","soutiens"]];
+  notesOf("a1").concat(notesOf("a3")).sort(byTsAsc).forEach(n=> rows.push([n.a==="a1"?"1 Diagnostic":"3 Limites", lab[n.y]||n.y, n.t, ""]));
+  ideas().sort(byTsAsc).forEach(i=> rows.push(["4 Idées","Idée",i.t,i.votes]));
+  download("aac-verbatims-"+today()+".csv", csv(rows));
+}
+function exportJson(){ download("aac-sauvegarde-"+today()+".json", JSON.stringify(S,null,1), "application/json"); }
+
+/* ---- données fictives (mode démo uniquement) ---- */
+function seedDemo(){
+  const rnd = a=> a[Math.floor(Math.random()*a.length)]; const u = {}; const now = Date.now();
+  const textes = {
+    manque:["Les parcelles vraiment concernées ne sont pas bien identifiées","La part des collectivités et des jardiniers"],
+    si:["…les couverts sont aidés et qu'on a des références sur mes sols","…l'administratif reste simple","…les efforts sont partagés avec les autres usagers","…je peux tester sur une petite surface d'abord"],
+    rouge:["Pas de perte de rendement sur mes blés","Pas d'interdiction sans solution alternative","Pas de contrôle à tout bout de champ"]};
+  const idees = ["Un tour de plaine collectif chaque automne","Une CUMA pour la herse étrille et la bineuse","Une aire de remplissage collective","Restituer localement les reliquats azotés","Un référent agriculteur pour le captage"];
+  const ids = idees.map((t,i)=>{ const id="demo_i"+i; u["idees/"+id] = {d:"demo"+i,t,ts:now+i}; return id; });
+  for(let i=0;i<28;i++){
+    const d = "demo"+i; u["part/"+d] = now;
+    CONFIG.themes.forEach(t=>{ if(Math.random()<.9) u["a1/"+d+"/"+t.k] = rnd(["oui","oui","nuance","non"]); });
+    CONFIG.leviers.forEach(l=>{ if(Math.random()<.9) u["a2/"+d+"/"+l.k] = rnd(["fait","test","test","cond","cond","pas"]); });
+    const fr = CONFIG.freins.slice().sort(()=>Math.random()-.5).slice(0,CONFIG.maxFreins); fr.forEach(f=> u["a3f/"+d+"/"+f.k] = true);
+    ids.forEach(id=>{ if(Math.random()<.45) u["votes/"+id+"/"+d] = true; });
+    let left = J; while(left>0){ const it = rnd(CONFIG.leviers); const k = "a5/"+d+"/"+it.k; u[k] = (u[k]||0)+1; left--; }
+  }
+  Object.keys(textes).forEach(y=> textes[y].forEach((t,i)=>{ u["notes/demo_"+y+i] = {d:"demoN",a:y==="manque"?"a1":"a3",y,t,ts:now+i}; }));
+  store.update(u);
+}
+
+/* ---- coquille et commandes ---- */
+function applyTheme(){ document.documentElement.setAttribute("data-theme", ev.theme); }
+function setEtat(patch){ store.set("etat", Object.assign({}, etat(), patch)); }
+function evShell(){
+  const app = $("#app"); app.className = "ev"; app.replaceChildren(); applyTheme();
+  ev.tabsEl = h("nav",{class:"ev-tabs","aria-label":"Ateliers"});
+  TABS.forEach(t=> ev.tabsEl.append(h("button",{type:"button",class:"tab","data-id":t.id,onclick:()=>evGo(t.id)}, t.n?h("b",null,t.n):null, t.label)));
+  ev.count = h("span",{class:"pill"});
+  ev.lockBtn = h("button",{type:"button",class:"ico","aria-label":"Commandes animateur",onclick:()=>{
+    if(unlocked){ unlocked = false; try{sessionStorage.removeItem("aac_unlock");}catch(e){} }
+    else { const p = window.prompt("Code animateur ?"); if(p===null) return; if(p!==CONFIG.pin) return toast("Code incorrect"); unlocked = true; try{sessionStorage.setItem("aac_unlock","1");}catch(e){} }
+    evChrome();
+  }},"🔒");
+  const themeBtn = h("button",{type:"button",class:"ico","aria-label":"Changer de thème",onclick:()=>{ ev.theme = ev.theme==="dark"?"light":"dark"; try{localStorage.setItem("aac_theme",ev.theme);}catch(e){} applyTheme(); }},"◐");
+  ev.main = h("main",{class:"ev-main"});
+  ev.ctl = h("div",{class:"ev-ctl"});
+  const brand = h("div",{class:"ev-brand",html:DROP_SVG+"<span></span>"});
+  fill(app, store.mode==="demo" ? h("div",{class:"demo-flag"},"Mode démo : renseignez la config Firebase (CONFIG.firebase) pour le jour J") : null,
+    h("header",{class:"ev-top"}, brand, ev.tabsEl, h("div",{class:"ev-right"},ev.count,themeBtn,ev.lockBtn)), ev.main, ev.ctl);
+  $(".ev-brand span").textContent = CONFIG.titre;
+  evGo(ev.tab, true);
+}
+function evGo(id, force){
+  if(!force && id===ev.tab && ev.view) return;
+  ev.tab = id; ev.view = E_BUILDERS[id](); ev.main.replaceChildren(ev.view.el); ev.main.scrollTop = 0;
+  evChrome(); ev.view.update();
+}
+function evChrome(){
+  document.body.classList.toggle("unlocked", unlocked);
+  ev.lockBtn.textContent = unlocked ? "🔓" : "🔒";
+  const e = etat();
+  Array.from(ev.tabsEl.children).forEach(b=>{
+    const id = b.dataset.id;
+    b.classList.toggle("on", id===ev.tab);
+    b.classList.toggle("live", e.actif>0 && !e.libre && id==="a"+e.actif);
+  });
+  ev.ctl.hidden = !unlocked; if(!unlocked) return;
+  const n = ev.tab.charAt(0)==="a" ? Number(ev.tab.slice(1)) : 0;
+  const cb = (t,f,c)=> h("button",{type:"button",class:"cb "+(c||""),onclick:f},t);
+  fill(ev.ctl,
+    n ? cb(e.actif===n && !e.libre ? "Atelier "+n+" ouvert" : "Ouvrir l'atelier "+n+" aux participants", ()=>setEtat({actif:n,clos:false,libre:false}), e.actif===n && !e.libre ? "on" : "pri") : null,
+    e.actif>0 ? cb(e.clos ? "Rouvrir les réponses" : "Clore les réponses", ()=>setEtat({clos:!e.clos})) : null,
+    cb(e.libre ? "Navigation libre : oui" : "Navigation libre : non", ()=>setEtat({libre:!e.libre}), e.libre?"on":""),
+    cb("Mettre en attente", ()=>setEtat({actif:0,clos:false,libre:false})),
+    h("span",{class:"sp"}),
+    store.mode==="demo" ? cb("Réponses fictives", seedDemo) : null,
+    cb("Chiffres (CSV)", exportChiffres), cb("Verbatims (CSV)", exportVerbatims), cb("Sauvegarde", exportJson),
+    cb("Tout effacer", ()=>{
+      if(window.prompt("Tapez EFFACER pour supprimer toutes les réponses de cette session.")==="EFFACER"){
+        Promise.resolve(store.clear()).then(()=>toast("Session remise à zéro"));
+      }
+    }, "danger"));
+}
+function evUpdate(){
+  if(!ev.tabsEl) return;
+  ev.count.textContent = plural(Object.keys(S.part||{}).length,"participant");
+  evChrome();
+  if(ev.view) ev.view.update();
+}
+
+/* =====================================================================
+   Démarrage
+   ===================================================================== */
+async function boot(){
+  document.title = CONFIG.titre+" · Ateliers";
+  if(CONFIG.firebase){
+    try{ store = await firebaseStore(); }
+    catch(e){ console.error(e); store = localStore(); toast("Connexion impossible : mode démo local"); }
+  } else store = localStore();
+  window.__aac = {get S(){return S;}, store, dev};
+  if(isEcran) evShell(); else pvShell();
+  store.subscribe(data=>{ S = data||{}; isEcran ? evUpdate() : pvUpdate(); });
+  if(!isEcran) store.set("part/"+dev, Date.now());
+}
+boot();
+})();
+</script>
+</body>
+</html>
