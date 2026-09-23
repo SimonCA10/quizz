@@ -181,7 +181,7 @@ const CONFIG = {
   // Ce n'est pas une vraie sécurité : il évite juste les fausses manips.
   pin: "1234",
 
-  titre: "AAC de Bar-sur-Seine",
+  titre: "AAC du captage de l'Abreuvoir",
   accroche: "Notre eau, notre plan d'action",
   jetons: 5,               // nombre de gouttes à répartir (atelier 5)
   maxFreins: 3,            // nombre de freins choisis (atelier 3)
@@ -197,42 +197,44 @@ const CONFIG = {
     appId: "1:427842448879:web:0e94f6f874e85d1eb79a1a"
   },
 
-  // Atelier 1 : les pressions identifiées par le DTPA (adaptez à votre diagnostic)
+  // Atelier 1 : les pressions identifiées par le DTPA et le plan d'actions (juillet 2026)
   themes: [
-    {k:"azote",    label:"Fertilisation azotée",            desc:"Doses, dates d'apport, fractionnement, reliquats"},
-    {k:"herbi",    label:"Herbicides",                      desc:"Molécules, périodes d'application, parcelles concernées"},
-    {k:"phyto",    label:"Autres produits phytosanitaires", desc:"Fongicides, insecticides, traitements de semences"},
-    {k:"sols",     label:"Sols nus et intercultures",       desc:"Lessivage hivernal, couverture des sols"},
-    {k:"transfert",label:"Transferts rapides vers la ressource", desc:"Ruissellement, drainage, zones vulnérables"},
-    {k:"ponctuel", label:"Pollutions ponctuelles",          desc:"Remplissage, rinçage, fonds de cuve, stockage"}
+    {k:"molecules", label:"Herbicides à fort risque de ruissellement", desc:"Propyzamide, diflufénicanil, pendiméthaline, lambda-cyhalothrine : les 4 molécules les plus surveillées"},
+    {k:"sols_nus",  label:"Sols nus en hiver",                          desc:"Lessivage et ruissellement de surface sur les parcelles non couvertes"},
+    {k:"ppr_mo",    label:"Matières organiques dans le périmètre rapproché", desc:"Épandage interdit sur les ~25 ha du PPR autour du captage"},
+    {k:"antigel",   label:"Aspersion antigel en viticulture",           desc:"Volumes aspergés et écoulements de surface pendant les périodes de gel"},
+    {k:"azote",     label:"Fertilisation azotée",                       desc:"Doses, périodes d'interdiction, outils de pilotage (directive Nitrates)"},
+    {k:"resistance",label:"Alternance des herbicides (classes HRAC)",   desc:"Risque de résistance des adventices, gestion intégrée"}
   ],
 
-  // Atelier 2 & 5 : les pistes d'action
+  // Atelier 2 & 5 : les pistes d'action du plan (axes 1 à 4)
   leviers: [
-    {k:"couverts",  label:"Couverts d'interculture réussis",             desc:"Longs, multi-espèces, semés tôt"},
-    {k:"azote",     label:"Ajuster et fractionner l'azote",              desc:"Reliquats, outils de pilotage, modulation"},
-    {k:"meca",      label:"Désherbage mécanique",                        desc:"Herse étrille, houe rotative, bineuse"},
-    {k:"ift",       label:"Programmes phyto allégés",                    desc:"Réduction de doses et d'IFT herbicides"},
-    {k:"biocontrole",label:"Biocontrôle et alternatives",                desc:"Produits de biocontrôle, leviers agronomiques"},
-    {k:"aire",      label:"Aire de remplissage et de lavage",            desc:"Individuelle ou collective, gestion des effluents"},
-    {k:"tampon",    label:"Zones tampons sur parcelles à risque",        desc:"Bandes enherbées, haies, fossés végétalisés"},
-    {k:"rotation",  label:"Allonger et diversifier la rotation",         desc:"Cultures de printemps, légumineuses"},
-    {k:"bas",       label:"Cultures bas-intrants sur zones sensibles",   desc:"Luzerne, prairie, chanvre"},
-    {k:"precision", label:"Pulvérisation de précision",                  desc:"Coupure de tronçons, buses anti-dérive, localisé"}
+    {k:"appli",       label:"Optimiser les conditions d'application",        desc:"Météo, doses, buses anti-dérive (action 1.2)"},
+    {k:"hrac",        label:"Alterner les classes d'herbicides (HRAC)",      desc:"Préserver l'efficacité, limiter la résistance (action 1.3)"},
+    {k:"couverts",    label:"Couverts et intercultures longues",             desc:"CIPAN, cultures dérobées en grandes cultures (action 2.1)"},
+    {k:"couvertvigne",label:"Couverts supplémentaires en vigne",             desc:"Semences certifiées AB, fauchage, roulage (action 2.2)"},
+    {k:"assolement",  label:"Diversifier l'assolement",                      desc:"Cultures de printemps, légumineuses (action 2.3)"},
+    {k:"certif",      label:"Conversion ou maintien AB / HVE / VDC / Terra Vitis", desc:"Certifications environnementales (action 2.4)"},
+    {k:"bandes",      label:"Maintenir les bandes enherbées de 5 m",         desc:"Le long des cours d'eau et des fossés (action 3.1)"},
+    {k:"haies",       label:"Planter et entretenir des haies",               desc:"Essences locales, bordures de parcelles (action 3.2)"},
+    {k:"hydraulique", label:"Aménagements d'hydraulique douce",              desc:"Fossés enherbés, mares, zones humides (action 3.3)"},
+    {k:"antigelopt",  label:"Optimiser l'aspersion antigel",                 desc:"Gestion des volumes, récupération des eaux (action 3.4)"},
+    {k:"nitrates",    label:"Bonnes pratiques Directive Nitrates",           desc:"Reliquats, N-tester, GPN (action 4.2)"},
+    {k:"methaniseur", label:"Cultures dédiées au méthaniseur",               desc:"Couverts intermédiaires valorisés localement (action 4.3)"}
   ],
 
   // Atelier 3 : les freins
   freins: [
     {k:"eco",     label:"Coût et revenu"},
-    {k:"rdt",     label:"Risque sur le rendement"},
+    {k:"rdt",     label:"Risque agronomique (rendement, qualité)"},
     {k:"temps",   label:"Temps de travail, pointes"},
-    {k:"materiel",label:"Matériel et investissement"},
+    {k:"materiel",label:"Matériel (désherbage méca, semis de couverts)"},
     {k:"refs",    label:"Manque de références locales"},
-    {k:"admin",   label:"Lourdeur administrative et contrôles"},
-    {k:"filiere", label:"Débouchés et cahiers des charges"},
-    {k:"climat",  label:"Aléas climatiques"},
-    {k:"equite",  label:"Les autres usagers font-ils leur part ?"},
-    {k:"regard",  label:"Le regard extérieur"}
+    {k:"admin",   label:"Lourdeur administrative, contrôles dans le PPR"},
+    {k:"filiere", label:"Débouchés et cahiers des charges (AOC, méthaniseur)"},
+    {k:"climat",  label:"Aléas climatiques (gel, fenêtres météo)"},
+    {k:"ab_vigne",label:"Contraintes de la certification AB en vigne"},
+    {k:"equite",  label:"Les autres usagers font-ils leur part ?"}
   ]
 };
 
