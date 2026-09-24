@@ -55,6 +55,9 @@ button:focus-visible,textarea:focus-visible{outline:3px solid var(--accent);outl
 .opt.on[data-v=test]{background:var(--c-test);color:#0A2A1A}
 .opt.on[data-v=nuance],.opt.on[data-v=cond]{background:var(--c-warn);color:#2B1D00}
 .opt.on[data-v=non],.opt.on[data-v=pas]{background:var(--c-no)}
+.opt.on[data-v=conc]{background:var(--accent);color:var(--on-accent)}
+.opt.on[data-v=mais]{background:var(--c-warn);color:#2B1D00}
+.opt.on[data-v=hors]{background:var(--c-neutral);color:#0D2E39}
 .chips{display:flex;flex-wrap:wrap;gap:8px}
 .chip{border:2px solid var(--line);background:var(--card);border-radius:999px;padding:10px 14px;font-weight:600;font-size:.92rem;text-align:left}
 .chip.on{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
@@ -121,7 +124,8 @@ textarea{width:100%;border:2px solid var(--line);border-radius:12px;padding:12px
 .bar .fill{background:var(--accent);height:100%;transition:width .5s ease}
 .seg2{display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;transition:width .5s ease;overflow:hidden;white-space:nowrap}
 .s-oui,.s-fait{background:var(--c-oui)} .s-test{background:var(--c-test);color:#0A2A1A}
-.s-nuance,.s-cond{background:var(--c-warn);color:#2B1D00} .s-non,.s-pas{background:var(--c-no)}
+.s-nuance,.s-cond,.s-mais{background:var(--c-warn);color:#2B1D00} .s-non,.s-pas{background:var(--c-no)}
+.s-conc{background:var(--accent);color:var(--on-accent)} .s-hors{background:var(--c-neutral);color:#0D2E39}
 .nums{color:var(--muted);font-size:.85em;text-align:right}
 .cols{display:grid;grid-template-columns:1fr 1fr;gap:2em}
 .cols h3{font-size:1.15em;margin:.2em 0 .6em}
@@ -158,7 +162,21 @@ body.unlocked .note .x-del{display:block}
 .cb.danger{border-color:var(--c-no);color:var(--c-no)}
 .cb.on{background:var(--accent-soft);border-color:var(--accent)}
 .ctl-tag{font-size:.8em;color:var(--muted);font-weight:600}
-@media (max-width:900px){.cols,.syn,.home{grid-template-columns:1fr}.srow{grid-template-columns:1fr}.nums{text-align:left}.qrbox{width:70vw}}
+.quad{display:grid;grid-template-columns:1fr 1fr;gap:.8em}
+.q{border:2px solid var(--line);border-radius:.9em;padding:.8em 1em;min-height:9em;background:var(--card)}
+.q h4{margin:0 0 .1em;font:700 1.05em var(--font-h)}
+.q .qs{color:var(--muted);font-size:.8em;margin-bottom:.5em}
+.q-a{border-color:var(--c-oui);background:color-mix(in srgb,var(--c-oui) 16%,var(--card))}
+.q-b{border-color:var(--c-warn);background:color-mix(in srgb,var(--c-warn) 16%,var(--card))}
+.q-c{border-color:var(--c-test);background:color-mix(in srgb,var(--c-test) 8%,var(--card))}
+.q-d{border-style:dashed}
+.qi{display:flex;justify-content:space-between;gap:.8em;padding:.3em 0;border-top:1px solid var(--line);font-weight:600;line-height:1.2}
+.qi small{color:var(--muted);font-weight:500;white-space:nowrap}
+.q-a .qi{font-size:1.1em}
+.axis{color:var(--muted);font-size:.85em;margin:.6em 0 0}
+.syn2{display:grid;grid-template-columns:1.25fr 1fr;gap:2em;align-items:start}
+.top1 .bar .fill{background:var(--c-warn)}
+@media (max-width:900px){.syn2{grid-template-columns:1fr}.quad{grid-template-columns:1fr}.cols,.syn,.home{grid-template-columns:1fr}.srow{grid-template-columns:1fr}.nums{text-align:left}.qrbox{width:70vw}}
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 </style>
 </head>
@@ -183,7 +201,8 @@ const CONFIG = {
 
   titre: "AAC du captage de l'Abreuvoir",
   accroche: "Notre eau, notre plan d'action",
-  jetons: 5,               // nombre de gouttes à répartir (atelier 5)
+  jetons: 8,               // nombre de gouttes à répartir (atelier 5)
+  maxIdees5: 5,            // atelier 5 : seules les N idées les plus soutenues (atelier 4) sont proposées
   maxFreins: 3,            // nombre de freins choisis (atelier 3)
 
   // Collez ici la config Firebase (Realtime Database). Laissez null = mode démo local.
@@ -201,7 +220,6 @@ const CONFIG = {
   themes: [
     {k:"molecules", label:"Herbicides à fort risque de ruissellement", desc:"Propyzamide, diflufénicanil, pendiméthaline, lambda-cyhalothrine : les 4 molécules les plus surveillées"},
     {k:"sols_nus",  label:"Sols nus en hiver",                          desc:"Lessivage et ruissellement de surface sur les parcelles non couvertes"},
-    {k:"ppr_mo",    label:"Matières organiques dans le périmètre rapproché", desc:"Épandage interdit sur les ~25 ha du PPR autour du captage"},
     {k:"antigel",   label:"Aspersion antigel en viticulture",           desc:"Volumes aspergés et écoulements de surface pendant les périodes de gel"},
     {k:"azote",     label:"Fertilisation azotée",                       desc:"Doses, périodes d'interdiction, outils de pilotage (directive Nitrates)"},
     {k:"resistance",label:"Alternance des herbicides (classes HRAC)",   desc:"Risque de résistance des adventices, gestion intégrée"}
@@ -215,11 +233,9 @@ const CONFIG = {
     {k:"couvertvigne",label:"Couverts supplémentaires en vigne",             desc:"Semences certifiées AB, fauchage, roulage (action 2.2)"},
     {k:"assolement",  label:"Diversifier l'assolement",                      desc:"Cultures de printemps, légumineuses (action 2.3)"},
     {k:"certif",      label:"Conversion ou maintien AB / HVE / VDC / Terra Vitis", desc:"Certifications environnementales (action 2.4)"},
-    {k:"bandes",      label:"Maintenir les bandes enherbées de 5 m",         desc:"Le long des cours d'eau et des fossés (action 3.1)"},
     {k:"haies",       label:"Planter et entretenir des haies",               desc:"Essences locales, bordures de parcelles (action 3.2)"},
     {k:"hydraulique", label:"Aménagements d'hydraulique douce",              desc:"Fossés enherbés, mares, zones humides (action 3.3)"},
     {k:"antigelopt",  label:"Optimiser l'aspersion antigel",                 desc:"Gestion des volumes, récupération des eaux (action 3.4)"},
-    {k:"nitrates",    label:"Bonnes pratiques Directive Nitrates",           desc:"Reliquats, N-tester, GPN (action 4.2)"},
     {k:"methaniseur", label:"Cultures dédiées au méthaniseur",               desc:"Couverts intermédiaires valorisés localement (action 4.3)"}
   ],
 
@@ -241,7 +257,7 @@ const CONFIG = {
 const J = CONFIG.jetons;
 const ATELIERS = [
   {id:"a1", n:1, court:"Diagnostic", titre:"Le diagnostic vu du terrain",
-   consigne:"Le diagnostic a repéré des pressions sur le territoire. Pour chacune, est-ce ce que vous constatez ?"},
+   consigne:"Le diagnostic a repéré des pressions sur le territoire. Pour chacune, comment vous situez-vous ?"},
   {id:"a2", n:2, court:"Envies", titre:"Mon panier d'actions",
    consigne:"Pour chaque piste, dites où vous en êtes. « Déjà en place » compte autant que « prêt à tester »."},
   {id:"a3", n:3, court:"Limites", titre:"Mes conditions et mes limites",
@@ -252,7 +268,7 @@ const ATELIERS = [
    consigne:"Vous avez "+J+" gouttes. Placez-les sur ce qui compte le plus pour le plan d'action, même toutes sur la même piste."}
 ];
 
-const A1_OPTS = [{v:"oui",t:"Je m'y retrouve",name:"Je m'y retrouve"},{v:"nuance",t:"À nuancer",name:"À nuancer"},{v:"non",t:"Pas chez moi",name:"Pas ce que je constate"}];
+const A1_OPTS = [{v:"conc",t:"Je me sens concerné",name:"Je me sens concerné"},{v:"mais",t:"Concerné, mais…",name:"Concerné, mais…"},{v:"hors",t:"Pas concerné",name:"Pas concerné"}];
 const A2_OPTS = [{v:"fait",t:"Déjà en place",name:"Déjà en place"},{v:"test",t:"Prêt à tester",name:"Prêt à tester"},{v:"cond",t:"Sous conditions",name:"Sous conditions"},{v:"pas",t:"Pas pour moi",name:"Pas pour moi"}];
 
 /* =====================================================================
@@ -388,7 +404,7 @@ function ideas(){
 }
 function items5(){
   const p = CONFIG.leviers.map(l=>({k:l.k,label:l.label,type:"piste"}));
-  const i = ideas().sort(byTsAsc).map(x=>({k:"i_"+x.id,label:x.t,type:"idee"}));
+  const i = ideas().sort((a,b)=>b.votes-a.votes||byTsAsc(a,b)).slice(0,CONFIG.maxIdees5).sort(byTsAsc).map(x=>({k:"i_"+x.id,label:x.t,type:"idee"}));
   return p.concat(i);
 }
 function gouttes(k){ let n=0; Object.values(S.a5||{}).forEach(m=>{ if(m && m[k]) n += m[k]; }); return n; }
@@ -702,33 +718,57 @@ function leverStats(l){
   const t = tally("a2",l.k); const tot = (t.fait||0)+(t.test||0)+(t.cond||0)+(t.pas||0);
   return {l,t,tot,g:gouttes(l.k),elan:tot?((t.fait||0)+(t.test||0))/tot:0};
 }
+function statBar(c, opts){
+  const tot = opts.reduce((n,o)=>n+(c[o.v]||0),0);
+  return h("div",{class:"bar"}, opts.map(o=>{ const n = c[o.v]||0; const sg = h("span",{class:"seg2 s-"+o.v,title:o.name}, n>0?n:""); sg.style.width = tot?(n/tot*100)+"%":"0%"; return sg; }));
+}
+function shareRow(label, bar, nums, cls){ return h("div",{class:"srow "+(cls||"")}, h("div",{class:"srow-l"},label), bar, h("span",{class:"nums"},nums)); }
 function viewSynth(){
   const el = h("div");
   return {el, update(){
-    const st = CONFIG.leviers.map(leverStats).sort((a,b)=>b.g-a.g||b.elan-a.elan);
-    const pct = (n,tot)=> tot? Math.round(n/tot*100)+" %" : "—";
-    const table = h("table",{class:"tbl"}, h("thead",null,h("tr",null,
-      h("th",null,"Piste"), A2_OPTS.map(o=>h("th",null,o.t)), h("th",null,"Gouttes"))),
-      h("tbody",null, st.map(s=> h("tr",null, h("td",null,h("strong",null,s.l.label)),
-        A2_OPTS.map(o=> h("td",null,pct(s.t[o.v]||0,s.tot))), h("td",null,h("strong",null,s.g))))));
+    const st = CONFIG.leviers.map(leverStats);
+    const totG = st.reduce((n,x)=>n+x.g,0), avgG = totG/st.length;
+    const known = st.filter(x=>x.tot>0).length>0 && totG>0;
+    const cell = (cls,titre,sous,pred)=>{
+      const arr = st.filter(pred).sort((a,b)=>b.g-a.g);
+      return h("div",{class:"q "+cls}, h("h4",null,titre), h("div",{class:"qs"},sous),
+        arr.length ? arr.map(x=>h("div",{class:"qi"}, h("span",null,x.l.label), h("small",null,Math.round(x.elan*100)+" % partants · "+x.g+" 💧"))) : h("p",{class:"empty"},"—"));
+    };
+    const hi = x=> x.g>=avgG && x.g>0, go = x=> x.tot>0 && x.elan>=.5;
+    const quad = h("div",{class:"quad"},
+      cell("q-b","À débloquer","Beaucoup de gouttes, mais des freins",x=>hi(x)&&!go(x)),
+      cell("q-a","À lancer en premier","Beaucoup de gouttes, et le groupe est partant",x=>hi(x)&&go(x)),
+      cell("q-d","En retrait","Peu de gouttes, peu d'élan",x=>!hi(x)&&!go(x)),
+      cell("q-c","Option complémentaire","Groupe partant, mais moins prioritaire",x=>!hi(x)&&go(x)));
+
+    const themes = CONFIG.themes.map(t=>{ const c = tally("a1",t.k); const tot=(c.conc||0)+(c.mais||0)+(c.hors||0); return {t,c,tot,p:tot?((c.conc||0)+(c.mais||0))/tot:0}; })
+      .filter(x=>x.tot>0).sort((a,b)=>b.p-a.p);
+    const nF = Math.max(1,Object.keys(S.a3f||{}).length);
     const freins = CONFIG.freins.map(f=>({f,n:freinCount(f.k)})).sort((a,b)=>b.n-a.n).filter(x=>x.n>0).slice(0,5);
-    const themes = CONFIG.themes.map(t=>{ const c = tally("a1",t.k); const tot=(c.oui||0)+(c.nuance||0)+(c.non||0); return {t,c,tot,p:tot?(c.oui||0)/tot:0}; })
-      .filter(x=>x.tot>0).sort((a,b)=>b.p-a.p).slice(0,3);
-    const rouges = notesOf("a3","rouge").sort(byTsDesc).slice(0,6);
-    const conds = notesOf("a3","si").sort(byTsDesc).slice(0,6);
-    const idees = ideas().sort((a,b)=>b.votes-a.votes).slice(0,5);
+    const rouges = notesOf("a3","rouge").sort(byTsDesc).slice(0,4);
+    const conds = notesOf("a3","si").sort(byTsDesc).slice(0,4);
+    const idees = ideas().sort((a,b)=>b.votes-a.votes).slice(0,3);
+    const maxV = Math.max(1,idees.length?idees[0].votes:1);
+
     el.replaceChildren(
       h("div",{class:"ev-head"}, h("h1",{class:"ev-title"},"Matière première du plan d'action"), h("span",{class:"pill"},plural(Object.keys(S.part||{}).length,"participant"))),
-      h("p",{class:"ev-lead"},"Ce que le groupe a exprimé, prêt à être transformé en actions. Les gouttes départagent, les colonnes de gauche disent où l'on en est."),
-      h("h3",{class:"sub"},"Les pistes, classées par gouttes"), table,
-      h("div",{class:"syn"},
+      h("div",{class:"syn2"},
         h("div",null,
-          h("h3",{class:"sub"},"Pressions les plus reconnues dans le diagnostic"),
-          themes.length ? themes.map(x=>h("span",{class:"tag"},x.t.label,h("b",null,Math.round(x.p*100)+" %"))) : h("p",{class:"empty"},"—"),
-          h("h3",{class:"sub"},"Freins qui reviennent"),
-          freins.length ? freins.map(x=>h("span",{class:"tag"},x.f.label,h("b",null,x.n))) : h("p",{class:"empty"},"—"),
+          h("h3",{class:"sub"},"Les pistes : où mettre l'énergie ?"),
+          known ? quad : h("p",{class:"empty"},"En attente des réponses des ateliers 2 et 5…"),
+          h("p",{class:"axis"},"En haut : au moins la part moyenne des gouttes. À droite : la moitié du groupe ou plus a répondu « déjà en place » ou « prêt à tester ».")),
+        h("div",null,
+          h("h3",{class:"sub"},"Pressions du diagnostic : qui se sent concerné ?"),
+          h("div",{class:"legend"}, A1_OPTS.map(o=>h("span",null,h("i",{class:"s-"+o.v}),o.name))),
+          themes.length ? themes.map(x=>shareRow(x.t.label, statBar(x.c,A1_OPTS), Math.round(x.p*100)+" % concernés")) : h("p",{class:"empty"},"—"),
+          h("h3",{class:"sub"},"Freins : ce qui revient le plus"),
+          freins.length ? freins.map((x,i)=>{ const fl = h("div",{class:"fill"}); fl.style.width = (x.n/nF*100)+"%";
+            return shareRow(x.f.label, h("div",{class:"bar"},fl), Math.round(x.n/nF*100)+" %", i===0?"top1":""); }) : h("p",{class:"empty"},"—"))),
+      h("div",{class:"syn2",style:"margin-top:1.2em"},
+        h("div",null,
           h("h3",{class:"sub"},"Idées les plus soutenues"),
-          idees.length ? idees.map(i=>h("div",{class:"note"},h("p",null,i.t+"  ("+plural(i.votes,"soutien")+")"))) : h("p",{class:"empty"},"—")),
+          idees.length ? idees.map(i=>{ const fl = h("div",{class:"fill"}); fl.style.width = (i.votes/maxV*100)+"%";
+            return h("div",{class:"irow"}, h("div",{class:"vn"},i.votes), h("div",null,h("p",null,i.t),h("div",{class:"bar"},fl))); }) : h("p",{class:"empty"},"—")),
         h("div",null,
           h("h3",{class:"sub"},"Je serais prêt à avancer si…"),
           conds.length ? conds.map(n=>h("div",{class:"note y-si"},h("p",null,n.t))) : h("p",{class:"empty"},"—"),
@@ -776,7 +816,7 @@ function seedDemo(){
   const ids = idees.map((t,i)=>{ const id="demo_i"+i; u["idees/"+id] = {d:"demo"+i,t,ts:now+i}; return id; });
   for(let i=0;i<28;i++){
     const d = "demo"+i; u["part/"+d] = now;
-    CONFIG.themes.forEach(t=>{ if(Math.random()<.9) u["a1/"+d+"/"+t.k] = rnd(["oui","oui","nuance","non"]); });
+    CONFIG.themes.forEach(t=>{ if(Math.random()<.9) u["a1/"+d+"/"+t.k] = rnd(["conc","conc","mais","hors"]); });
     CONFIG.leviers.forEach(l=>{ if(Math.random()<.9) u["a2/"+d+"/"+l.k] = rnd(["fait","test","test","cond","cond","pas"]); });
     const fr = CONFIG.freins.slice().sort(()=>Math.random()-.5).slice(0,CONFIG.maxFreins); fr.forEach(f=> u["a3f/"+d+"/"+f.k] = true);
     ids.forEach(id=>{ if(Math.random()<.45) u["votes/"+id+"/"+d] = true; });
